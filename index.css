@@ -236,6 +236,163 @@
   transform: translateY(0);
 }
 
+/* Collapsible grid-template-rows 0fr -> 1fr (+ opacity) */
+.collapsible-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition-property: grid-template-rows, opacity;
+  transition-duration: var(--dur-base, 250ms);
+  transition-timing-function: var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.collapsible-grid[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.collapsible-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Pointer-follow radial spotlight (active only on fine hover pointers) */
+.pointer-glow-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.pointer-glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(21, 99, 88, 0.095),
+    transparent 68%
+  );
+  transition: opacity var(--dur-base, 250ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+@supports (color: color-mix(in oklch, black, white)) {
+  .pointer-glow-card::before {
+    background: radial-gradient(
+      340px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklch, var(--color-accent) 11%, transparent),
+      transparent 68%
+    );
+  }
+}
+
+.pointer-glow-dark::before {
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.08),
+    transparent 68%
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pointer-glow-card:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Metric accent underline draw (scaleX only) */
+@keyframes scaleXDraw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.metric-underline-draw {
+  transform: scaleX(0);
+  animation: scaleXDraw var(--dur-slow, 450ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+[dir='rtl'] .metric-underline-draw {
+  transform-origin: 100% 50%;
+}
+
+[dir='ltr'] .metric-underline-draw {
+  transform-origin: 0% 50%;
+}
+
+/* SVG stroke-dashoffset check draw */
+.svg-check-path {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  transition: stroke-dashoffset var(--dur-base, 250ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.svg-check-path[data-checked='true'] {
+  stroke-dashoffset: 0;
+}
+
+/* Placeholder card calm shimmer (transform only) */
+@keyframes placeholderShimmer {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.placeholder-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.placeholder-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 28%,
+    rgba(255, 255, 255, 0.045) 50%,
+    transparent 72%
+  );
+  transform: translate3d(-100%, 0, 0);
+  animation: placeholderShimmer 4.8s ease-in-out infinite;
+}
+
+/* Ecosystem strip CSS-transform marquee (paused on hover, static under reduced motion) */
+@keyframes ecosystemMarquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ecosystemMarquee 24s linear infinite;
+}
+
+.marquee-viewport:hover .marquee-track,
+.marquee-viewport:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
 /* Sticky header scroll-progress bar (hidden fallback when unsupported) */
 .scroll-progress-bar {
   opacity: 0;
@@ -366,6 +523,35 @@
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .collapsible-grid,
+  .svg-check-path {
+    transition: none !important;
+  }
+
+  .metric-underline-draw {
+    animation: none !important;
+    transform: scaleX(1) !important;
+  }
+
+  .pointer-glow-card::before,
+  .placeholder-shimmer::after {
+    animation: none !important;
+    display: none !important;
+  }
+
+  .marquee-viewport {
+    overflow: visible;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
   }
 
   .scroll-progress-bar {
