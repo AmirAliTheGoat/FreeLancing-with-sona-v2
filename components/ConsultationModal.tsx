@@ -185,7 +185,7 @@ const ConsultationModal: React.FC = () => {
   };
 
   const fieldClasses =
-    'w-full min-h-[44px] px-3.5 rounded-control border border-border bg-surface-warm/60 text-sm text-ink placeholder:text-ink-muted/65 focus:bg-surface focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,background-color,box-shadow] duration-250 motion-reduce:transition-none';
+    'w-full min-h-[44px] px-3.5 rounded-control border border-border bg-surface-warm/60 text-sm text-ink placeholder:text-ink-muted focus:bg-surface focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,background-color,box-shadow] duration-250 motion-reduce:transition-none';
 
   return (
     <dialog
@@ -348,6 +348,7 @@ const ConsultationModal: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               {errorMsg && (
                 <div
+                  id="intake-form-error"
                   key={errorShakeKey}
                   role="alert"
                   className="animate-shake p-3.5 rounded-card bg-red-50 border border-red-200 text-red-900 text-xs sm:text-sm flex items-center gap-2.5"
@@ -365,7 +366,11 @@ const ConsultationModal: React.FC = () => {
                   <input
                     id="intake-name"
                     type="text"
+                    autoComplete="name"
+                    inputMode="text"
                     required
+                    aria-invalid={Boolean(errorMsg)}
+                    aria-describedby={errorMsg ? 'intake-form-error' : undefined}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder={modal.fullNamePlaceholder}
@@ -380,7 +385,11 @@ const ConsultationModal: React.FC = () => {
                   <input
                     id="intake-contact"
                     type="text"
+                    autoComplete="tel"
+                    inputMode="text"
                     required
+                    aria-invalid={Boolean(errorMsg)}
+                    aria-describedby={errorMsg ? 'intake-form-error' : undefined}
                     value={contactHandle}
                     onChange={(e) => setContactHandle(e.target.value)}
                     placeholder={modal.contactPlaceholder}
@@ -396,7 +405,11 @@ const ConsultationModal: React.FC = () => {
                 <input
                   id="intake-email"
                   type="email"
+                  autoComplete="email"
+                  inputMode="email"
                   required
+                  aria-invalid={Boolean(errorMsg)}
+                  aria-describedby={errorMsg ? 'intake-form-error' : undefined}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={modal.emailPlaceholder}
@@ -499,7 +512,7 @@ const ConsultationModal: React.FC = () => {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={modal.notesPlaceholder}
-                  className="w-full p-3.5 rounded-control border border-border bg-surface-warm/60 text-sm text-ink placeholder:text-ink-muted/65 focus:bg-surface focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,background-color,box-shadow] duration-250 resize-none motion-reduce:transition-none"
+                  className="w-full p-3.5 rounded-control border border-border bg-surface-warm/60 text-sm text-ink placeholder:text-ink-muted focus:bg-surface focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,background-color,box-shadow] duration-250 resize-none motion-reduce:transition-none"
                 />
               </div>
 

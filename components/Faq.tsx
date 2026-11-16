@@ -85,7 +85,7 @@ const Faq: React.FC = () => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder={section.searchPlaceholder}
             aria-label={section.searchPlaceholder}
-            className="w-full min-h-[48px] bg-surface border border-border rounded-control ps-11 pe-12 text-sm text-ink placeholder:text-ink-muted/70 shadow-subtle focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,box-shadow] duration-250 motion-reduce:transition-none"
+            className="w-full min-h-[48px] bg-surface border border-border rounded-control ps-11 pe-12 text-sm text-ink placeholder:text-ink-muted shadow-subtle focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,box-shadow] duration-250 motion-reduce:transition-none"
           />
           {query && (
             <button
@@ -124,12 +124,14 @@ const Faq: React.FC = () => {
               {filteredItems.map((item) => {
                 const isOpen = openId === item.id;
                 const panelId = `faq-panel-${item.id}`;
+                const triggerId = `faq-trigger-${item.id}`;
                 return (
                   <div
                     key={item.id}
                     onKeyDown={(e) => handleTriggerKeyDown(e, item.id)}
                   >
                     <button
+                      id={triggerId}
                       type="button"
                       data-faq-trigger="true"
                       data-faq-id={item.id}
@@ -158,6 +160,7 @@ const Faq: React.FC = () => {
 
                     <Collapsible
                       id={panelId}
+                      labelledBy={triggerId}
                       isOpen={isOpen}
                     >
                       <div className="pb-5 text-sm sm:text-base text-ink-muted leading-relaxed space-y-2.5 text-pretty">

@@ -5,6 +5,7 @@ import { Reveal } from './Reveal';
 import { Collapsible } from './ui/Collapsible';
 import { usePointerGlow } from './ui/usePointerGlow';
 import { useApp } from '../context/AppContext';
+import { DRAFT_MODE } from '../constants';
 import { PLACEHOLDER_PACKAGES } from '../data/placeholders';
 import { Language, PlaceholderPackage } from '../types';
 
@@ -68,10 +69,12 @@ const TrackCard: React.FC<TrackCardProps> = ({
 
           <div className="bg-surface-warm/70 rounded-card p-4 border border-border my-5 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-medium text-ink-muted">
-                {placeholderBadge}
-              </p>
-              <p className="text-sm sm:text-base font-bold text-ink tabular-nums mt-0.5">
+              {DRAFT_MODE && (
+                <p className="text-xs font-medium text-ink-muted mb-0.5">
+                  {placeholderBadge}
+                </p>
+              )}
+              <p className="text-sm sm:text-base font-bold text-ink tabular-nums">
                 {pkg.priceDisplay[lang]}
               </p>
             </div>

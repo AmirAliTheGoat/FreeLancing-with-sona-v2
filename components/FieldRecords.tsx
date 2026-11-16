@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { Reveal } from './Reveal';
 import { usePointerGlow } from './ui/usePointerGlow';
 import { useApp } from '../context/AppContext';
+import { DRAFT_MODE } from '../constants';
 import { PLACEHOLDER_CASE_RECORDS, PLACEHOLDER_REFERENCES } from '../data/placeholders';
 import { Language, PlaceholderCaseRecord, PlaceholderReferenceSlot, RecordCategory } from '../types';
 
@@ -40,33 +41,37 @@ const CaseSlotCard: React.FC<CaseSlotCardProps> = ({
     <Reveal index={index}>
       <article
         ref={glowRef}
-        className="pointer-glow-card pointer-glow-dark placeholder-shimmer bg-obsidian-card text-white rounded-panel border border-white/15 p-6 sm:p-7 h-full flex flex-col justify-between transition-[transform,border-color] duration-250 ease-out-expo hover:-translate-y-0.5 hover:border-white/35 motion-reduce:hover:translate-y-0"
+        className={`pointer-glow-card pointer-glow-dark ${
+          DRAFT_MODE ? 'placeholder-shimmer' : ''
+        } bg-obsidian-card text-white rounded-panel border border-white/15 p-6 sm:p-7 h-full flex flex-col justify-between transition-[transform,border-color] duration-250 ease-out-expo hover:-translate-y-0.5 hover:border-white/35 motion-reduce:hover:translate-y-0`}
       >
         <div>
           <div className="flex items-center justify-between gap-2 pb-3 mb-4 border-b border-white/15 text-xs">
             <span className="font-bold text-white tabular-nums">{record.slotCode}</span>
-            <span className="text-white/75 font-medium">{placeholderTag}</span>
+            {DRAFT_MODE && (
+              <span className="text-white/80 font-medium">{placeholderTag}</span>
+            )}
           </div>
 
-          <p className="text-xs font-semibold text-white/70 mb-4">
+          <p className="text-xs font-semibold text-white/75 mb-4">
             {record.platform[lang]}
           </p>
 
           <dl className="space-y-3 text-sm mb-5">
             <div>
-              <dt className="text-xs text-white/60">{specialtyLabel}</dt>
+              <dt className="text-xs text-white/75">{specialtyLabel}</dt>
               <dd className="font-medium text-white/95 mt-0.5">
                 {record.specialtyPlaceholder[lang]}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-white/60">{timeframeLabel}</dt>
+              <dt className="text-xs text-white/75">{timeframeLabel}</dt>
               <dd className="font-medium text-white/95 mt-0.5">
                 {record.timeframePlaceholder[lang]}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-white/60">{outcomeLabel}</dt>
+              <dt className="text-xs text-white/75">{outcomeLabel}</dt>
               <dd className="font-semibold text-white mt-0.5">
                 {record.outcomePlaceholder[lang]}
               </dd>
@@ -74,7 +79,7 @@ const CaseSlotCard: React.FC<CaseSlotCardProps> = ({
           </dl>
         </div>
 
-        <p className="text-xs text-white/70 leading-relaxed pt-4 border-t border-white/15">
+        <p className="text-xs text-white/75 leading-relaxed pt-4 border-t border-white/15">
           {record.notesPlaceholder[lang]}
         </p>
       </article>
@@ -101,26 +106,30 @@ const ReferenceSlotCard: React.FC<ReferenceSlotCardProps> = ({
     <Reveal index={index}>
       <blockquote
         ref={glowRef}
-        className="pointer-glow-card pointer-glow-dark placeholder-shimmer bg-obsidian-card text-white rounded-panel border border-white/15 p-6 h-full flex flex-col justify-between transition-[transform,border-color] duration-250 ease-out-expo hover:-translate-y-0.5 hover:border-white/30 motion-reduce:hover:translate-y-0"
+        className={`pointer-glow-card pointer-glow-dark ${
+          DRAFT_MODE ? 'placeholder-shimmer' : ''
+        } bg-obsidian-card text-white rounded-panel border border-white/15 p-6 h-full flex flex-col justify-between transition-[transform,border-color] duration-250 ease-out-expo hover:-translate-y-0.5 hover:border-white/30 motion-reduce:hover:translate-y-0`}
       >
         <div>
           <div className="flex items-center justify-between text-xs mb-4">
-            <span className="font-bold text-white/85 tabular-nums">{item.slotCode}</span>
-            <span className="text-white/70 font-medium">{placeholderTag}</span>
+            <span className="font-bold text-white/90 tabular-nums">{item.slotCode}</span>
+            {DRAFT_MODE && (
+              <span className="text-white/75 font-medium">{placeholderTag}</span>
+            )}
           </div>
-          <p className="text-sm sm:text-base text-white/90 leading-relaxed mb-6">
+          <p className="text-sm sm:text-base text-white/95 leading-relaxed mb-6">
             {item.quotePlaceholder[lang]}
           </p>
         </div>
 
-        <footer className="pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-2 text-xs text-white/70">
+        <div className="pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-2 text-xs text-white/75">
           <div>
             <span className="font-semibold text-white">{item.authorPlaceholder[lang]}</span>
             <span className="mx-2" aria-hidden="true">·</span>
             <span>{item.rolePlaceholder[lang]}</span>
           </div>
           <span className="tabular-nums">{item.datePlaceholder[lang]}</span>
-        </footer>
+        </div>
       </blockquote>
     </Reveal>
   );
@@ -199,7 +208,7 @@ const FieldRecords: React.FC = () => {
           <Reveal index={0}>
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 pb-8 border-b border-white/15">
               <div className="max-w-2xl">
-                <p className="text-xs font-semibold tracking-wide text-white/70 mb-2">
+                <p className="text-xs font-semibold tracking-wide text-white/80 mb-2">
                   {section.kicker}
                 </p>
                 <h2 className="font-display text-fluid-h1 font-extrabold text-white mb-3 text-balance">
@@ -208,7 +217,7 @@ const FieldRecords: React.FC = () => {
                     {section.headingSerif}
                   </span>
                 </h2>
-                <p className="text-sm sm:text-base text-white/75 leading-relaxed text-pretty">
+                <p className="text-sm sm:text-base text-white/80 leading-relaxed text-pretty">
                   {section.intro}
                 </p>
               </div>
@@ -285,7 +294,7 @@ const FieldRecords: React.FC = () => {
               <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-1">
                 {section.referencesHeading}
               </h3>
-              <p className="text-sm text-white/70">{section.referencesSubheading}</p>
+              <p className="text-sm text-white/80">{section.referencesSubheading}</p>
             </div>
           </Reveal>
 
@@ -304,7 +313,7 @@ const FieldRecords: React.FC = () => {
 
         {/* Bottom Ecosystem Strip: CSS-Transform Marquee (paused on hover, static under reduced motion) */}
         <div className="pt-8 border-t border-white/15 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/65 shrink-0">
+          <p className="text-xs font-semibold uppercase tracking-widest text-white/75 shrink-0">
             {section.ecosystemStripLabel}
           </p>
 

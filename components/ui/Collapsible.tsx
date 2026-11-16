@@ -2,6 +2,7 @@ import React, { useId } from 'react';
 
 interface CollapsibleProps {
   id?: string;
+  labelledBy?: string;
   isOpen: boolean;
   onToggle?: () => void;
   trigger?: React.ReactNode;
@@ -13,6 +14,7 @@ interface CollapsibleProps {
 
 export const Collapsible: React.FC<CollapsibleProps> = ({
   id,
+  labelledBy,
   isOpen,
   onToggle,
   trigger,
@@ -23,11 +25,14 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
 }) => {
   const autoId = useId();
   const panelId = id ?? `collapsible-panel-${autoId}`;
+  const triggerId = `${panelId}-trigger`;
+  const regionLabelledBy = labelledBy ?? (trigger ? triggerId : undefined);
 
   return (
     <div className={className}>
       {trigger && (
         <button
+          id={triggerId}
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
@@ -40,6 +45,7 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
       <div
         id={panelId}
         role="region"
+        aria-labelledby={regionLabelledBy}
         aria-hidden={!isOpen}
         data-open={isOpen ? 'true' : 'false'}
         className={`collapsible-grid ${panelClassName}`}

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, ArrowUp, CheckCircle2, Globe } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { DRAFT_MODE } from '../constants';
 import { EDITORIAL_ASSETS, PLACEHOLDER_PROFILE } from '../data/placeholders';
+import { resolveContactHref } from '../utils/calculations';
 
 const Footer: React.FC = () => {
   const { lang, setLang, t, subscribeNewsletter, bookingModal } = useApp();
@@ -67,6 +69,8 @@ const Footer: React.FC = () => {
 
   const backToTopVisible = !heroVisible && !bookingModal.isOpen;
   const stickyBarOffset = !heroVisible && !footerVisible;
+  const emailHref = resolveContactHref(PLACEHOLDER_PROFILE.contactEmail, 'email');
+  const telegramHref = resolveContactHref(PLACEHOLDER_PROFILE.contactTelegram, 'telegram');
 
   return (
     <>
@@ -81,7 +85,7 @@ const Footer: React.FC = () => {
               <h2 className="font-display text-xl sm:text-2xl font-bold text-white mb-2">
                 {footer.newsletterTitle}
               </h2>
-              <p className="text-white/70 text-sm text-pretty">{footer.newsletterSubtitle}</p>
+              <p className="text-white/80 text-sm text-pretty">{footer.newsletterSubtitle}</p>
             </div>
 
             <div className="w-full lg:w-auto lg:min-w-[430px]">
@@ -90,17 +94,24 @@ const Footer: React.FC = () => {
                 className="flex flex-col sm:flex-row gap-2.5"
                 noValidate
               >
+                <label htmlFor="footer-newsletter-email" className="sr-only">
+                  {footer.emailPlaceholder}
+                </label>
                 <input
+                  id="footer-newsletter-email"
                   type="email"
+                  autoComplete="email"
+                  inputMode="email"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (status !== 'idle') setStatus('idle');
                   }}
                   placeholder={footer.emailPlaceholder}
-                  aria-label={footer.emailPlaceholder}
+                  aria-invalid={status === 'invalid'}
+                  aria-describedby={status !== 'idle' ? 'footer-newsletter-feedback' : undefined}
                   dir="ltr"
-                  className="flex-1 min-h-[48px] bg-obsidian-card border border-white/20 rounded-control px-4 text-sm text-white placeholder:text-white/50 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-[border-color,box-shadow] duration-250 motion-reduce:transition-none"
+                  className="flex-1 min-h-[48px] bg-obsidian-card border border-white/25 rounded-control px-4 text-sm text-white placeholder:text-white/75 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 transition-[border-color,box-shadow] duration-250 motion-reduce:transition-none"
                 />
                 <button
                   type="submit"
@@ -111,19 +122,31 @@ const Footer: React.FC = () => {
               </form>
 
               {status === 'success' && (
-                <p className="mt-2.5 text-xs text-emerald-300 flex items-center gap-1.5">
+                <p
+                  id="footer-newsletter-feedback"
+                  role="status"
+                  className="mt-2.5 text-xs text-emerald-300 flex items-center gap-1.5"
+                >
                   <CheckCircle2 size={14} className="shrink-0" aria-hidden="true" />
                   <span>{footer.newsletterSuccess}</span>
                 </p>
               )}
               {status === 'duplicate' && (
-                <p className="mt-2.5 text-xs text-white/75 flex items-center gap-1.5">
+                <p
+                  id="footer-newsletter-feedback"
+                  role="status"
+                  className="mt-2.5 text-xs text-white/80 flex items-center gap-1.5"
+                >
                   <AlertCircle size={14} className="shrink-0" aria-hidden="true" />
                   <span>{footer.newsletterDuplicate}</span>
                 </p>
               )}
               {status === 'invalid' && (
-                <p className="mt-2.5 text-xs text-amber-300 flex items-center gap-1.5">
+                <p
+                  id="footer-newsletter-feedback"
+                  role="alert"
+                  className="mt-2.5 text-xs text-amber-300 flex items-center gap-1.5"
+                >
                   <AlertCircle size={14} className="shrink-0" aria-hidden="true" />
                   <span>{footer.newsletterInvalid}</span>
                 </p>
@@ -137,13 +160,21 @@ const Footer: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-card overflow-hidden border border-white/20 bg-obsidian-card flex items-center justify-center shrink-0">
                   {!avatarFailed ? (
-                    <img
-                      src={EDITORIAL_ASSETS.sonaPortrait}
-                      alt="Sona"
-                      referrerPolicy="no-referrer"
-                      onError={() => setAvatarFailed(true)}
-                      className="w-full h-full object-cover object-top"
-                    />
+                    <picture>
+                      <source type="image/avif" srcSet={EDITORIAL_ASSETS.sonaPortraitAvif} />
+                      <source type="image/webp" srcSet={EDITORIAL_ASSETS.sonaPortraitWebp} />
+                      <img
+                        src={EDITORIAL_ASSETS.sonaPortrait}
+                        alt="Sona"
+                        width={640}
+                        height={640}
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        onError={() => setAvatarFailed(true)}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    </picture>
                   ) : (
                     <span className="font-bold text-white">S</span>
                   )}
@@ -152,20 +183,22 @@ const Footer: React.FC = () => {
                   <span dir="ltr" className="inline-block font-display text-lg font-bold text-white">
                     Sona.
                   </span>
-                  <span className="block text-xs text-white/65">{t.hero.sideHustleTag}</span>
+                  <span className="block text-xs text-white/80">{t.straightTalk.portraitRole}</span>
                 </div>
               </div>
 
-              <p className="text-white/70 text-xs sm:text-sm leading-relaxed max-w-md text-pretty">
-                {footer.colophonNote}
-              </p>
+              {DRAFT_MODE && (
+                <p className="text-white/80 text-xs sm:text-sm leading-relaxed max-w-md text-pretty">
+                  {footer.colophonNote}
+                </p>
+              )}
             </div>
 
             <div className="md:col-span-3">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-white/60 mb-3">
+              <h3 className="font-bold text-xs uppercase tracking-wider text-white/75 mb-3">
                 {footer.linksTitle}
               </h3>
-              <ul className="space-y-0.5 text-sm text-white/85">
+              <ul className="space-y-0.5 text-sm text-white/90">
                 {t.nav.map((item) => (
                   <li key={item.href}>
                     <a
@@ -180,21 +213,45 @@ const Footer: React.FC = () => {
             </div>
 
             <div className="md:col-span-4 space-y-2.5">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-white/60 mb-4">
+              <h3 className="font-bold text-xs uppercase tracking-wider text-white/80 mb-4">
                 {footer.contactTitle}
               </h3>
-              <p className="text-sm text-white/90 font-medium" dir="ltr">
-                {PLACEHOLDER_PROFILE.contactEmail}
-              </p>
-              <p className="text-sm text-white/90 font-medium" dir="ltr">
-                {PLACEHOLDER_PROFILE.contactTelegram}
-              </p>
-              <p className="text-xs text-white/65">{PLACEHOLDER_PROFILE.locationLabel[lang]}</p>
+              {emailHref ? (
+                <a
+                  href={emailHref}
+                  dir="ltr"
+                  className="min-h-[44px] inline-flex items-center text-sm text-white/95 font-medium underline-offset-4 hover:underline hover:text-white rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                >
+                  {PLACEHOLDER_PROFILE.contactEmail}
+                </a>
+              ) : (
+                <p className="text-sm text-white/95 font-medium" dir="ltr">
+                  {PLACEHOLDER_PROFILE.contactEmail}
+                </p>
+              )}
+              {telegramHref ? (
+                <div>
+                  <a
+                    href={telegramHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    dir="ltr"
+                    className="min-h-[44px] inline-flex items-center text-sm text-white/95 font-medium underline-offset-4 hover:underline hover:text-white rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    {PLACEHOLDER_PROFILE.contactTelegram}
+                  </a>
+                </div>
+              ) : (
+                <p className="text-sm text-white/95 font-medium" dir="ltr">
+                  {PLACEHOLDER_PROFILE.contactTelegram}
+                </p>
+              )}
+              <p className="text-xs text-white/80">{PLACEHOLDER_PROFILE.locationLabel[lang]}</p>
             </div>
           </div>
 
           {/* Bottom Legal & Language Selector */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-white/65 text-xs pt-6 border-t border-white/15">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-white/75 text-xs pt-6 border-t border-white/15">
             <p>{footer.copyright}</p>
 
             <div className="flex items-center gap-2.5">

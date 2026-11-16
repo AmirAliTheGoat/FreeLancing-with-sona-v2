@@ -3,35 +3,46 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <title>Sona | پرونده شفاف زیرساخت و مشاوره فریلنسری بین‌المللی ۱۴۰۵</title>
+    <!-- DRAFT: remove robots noindex before launch -->
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#faf9f6" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <title>Sona | راهنمای عملی فریلنسری بین‌المللی از ایران (۱۴۰۵)</title>
     <meta
       name="description"
-      content="توضیح صادقانه و بدون اغراق درباره واقعیت‌های فنی، ریسک‌های احراز هویت (KYC)، هزینه‌های جاری و مسیر واقعی کار بین‌المللی از ایران."
+      content="راهنمای عملی سونا برای کار در آپورک و فایور از ایران: عادت‌های امن، استفاده از ابزارهای هوش مصنوعی و برآورد هزینه‌های ماهانه."
     />
 
     <!-- OpenGraph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Sona" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:locale:alternate" content="en_US" />
     <meta
       property="og:title"
-      content="Sona | پرونده شفاف زیرساخت و مشاوره فریلنسری بین‌المللی ۱۴۰۵"
+      content="Sona | راهنمای عملی فریلنسری بین‌المللی از ایران (۱۴۰۵)"
     />
     <meta
       property="og:description"
-      content="توضیح صادقانه و بدون اغراق درباره واقعیت‌های فنی، ریسک‌های احراز هویت (KYC)، هزینه‌های جاری و مسیر واقعی کار بین‌المللی از ایران."
+      content="راهنمای عملی سونا برای کار در آپورک و فایور از ایران: عادت‌های امن، استفاده از ابزارهای هوش مصنوعی و برآورد هزینه‌های ماهانه."
     />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-    <!-- Twitter / X Cards -->
+    <!-- Twitter / X Cards (fa primary, updated dynamically when language toggles) -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Sona | Candid International Freelancing Dossier & Setup Brief 2026"
+      content="Sona | راهنمای عملی فریلنسری بین‌المللی از ایران (۱۴۰۵)"
     />
     <meta
       name="twitter:description"
-      content="An honest, non-hyped operational brief on international freelancing from Iran: real KYC and IP risks, ongoing monthly infrastructure costs, and readiness prerequisites."
+      content="راهنمای عملی سونا برای کار در آپورک و فایور از ایران: عادت‌های امن، استفاده از ابزارهای هوش مصنوعی و برآورد هزینه‌های ماهانه."
     />
+    <meta name="twitter:image" content="/og-image.jpg" />
 
     <!-- Dynamic Canonical & OpenGraph URL -->
     <script>
@@ -56,28 +67,29 @@
         "@graph": [
           {
             "@type": "ProfessionalService",
-            "name": "Sona International Freelancing Advisory",
-            "description": "Candid operational brief and technical infrastructure advisory for remote specialists working internationally from Iran.",
+            "name": "Sona International Freelancing Guide",
+            "description": "راهنمای عملی سونا برای کار در آپورک و فایور از ایران: عادت‌های امن، استفاده از ابزارهای هوش مصنوعی و برآورد هزینه‌های ماهانه.",
             "areaServed": "Worldwide",
             "availableLanguage": ["fa", "en"]
           },
           {
             "@type": "FAQPage",
+            "inLanguage": "fa",
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Is there any guarantee I will land paid projects in month one or two?",
+                "name": "معمولاً چقدر زمان می‌برد تا نخستین پروژه ثبت شود؟",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No. Neither mentorship nor account setup can guarantee client work. Winning contracts depends on portfolio quality, niche demand, pricing, and communication."
+                  "text": "به‌طور معمول ۲ تا ۴ ماه بازه‌ای واقع‌بینانه برای تنظیم پروفایل، ارسال منظم پیشنهادها و رقابت برای پروژه‌های نخست است که بسته به مهارت و پیگیری شما متفاوت خواهد بود."
                 }
               },
               {
                 "@type": "Question",
-                "name": "What recurring costs exist beyond the one-time setup?",
+                "name": "هزینه‌های جاری ماهانه دقیقاً چه چیزهایی هستند؟",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Expect monthly VPS hosting, clean residential proxy renewal, Upwork Connects, and exchange conversion spreads on withdrawals."
+                  "text": "تمدید ماهانه سرور مجازی (VPS)، پروکسی آی‌پی مسکونی، خرید Connects در آپورک و چند درصد کارمزد صرافی هنگام نقد کردن."
                 }
               }
             ]

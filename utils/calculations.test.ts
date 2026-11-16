@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterFaqItems } from './calculations';
+import { filterFaqItems, resolveContactHref } from './calculations';
 import { DOSSIER_CONTENT } from '../data/content';
 
 test('filterFaqItems matches questions, answers, and keywords across EN and FA', () => {
@@ -14,4 +14,13 @@ test('filterFaqItems matches questions, answers, and keywords across EN and FA',
   const faMatches = filterFaqItems(faItems, 'غیرفنی');
   assert.equal(faMatches.length, 1);
   assert.equal(faMatches[0].id, 'non-tech-curve');
+});
+
+test('resolveContactHref returns null for bracketed placeholders and links for real values', () => {
+  assert.equal(resolveContactHref('[PLACEHOLDER_EMAIL: info@yourdomain.com]', 'email'), null);
+  assert.equal(resolveContactHref('[PLACEHOLDER_TELEGRAM: @your_handle]', 'telegram'), null);
+  assert.equal(resolveContactHref('   ', 'email'), null);
+  assert.equal(resolveContactHref('info@sona.example', 'email'), 'mailto:info@sona.example');
+  assert.equal(resolveContactHref('@sona_guide', 'telegram'), 'https://t.me/sona_guide');
+  assert.equal(resolveContactHref('sona_guide', 'telegram'), 'https://t.me/sona_guide');
 });

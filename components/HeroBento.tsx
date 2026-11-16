@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, Search } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useApp } from '../context/AppContext';
+import { DRAFT_MODE } from '../constants';
 import { EDITORIAL_ASSETS } from '../data/placeholders';
 
 const HeroBento: React.FC = () => {
@@ -45,18 +46,20 @@ const HeroBento: React.FC = () => {
     }
   };
 
-  const heroPillars =
+  const allPillars =
     lang === 'fa'
       ? [
           { label: 'زبان انگلیسی', value: 'هوش مصنوعی سد زبان را کوچک‌تر کرده است' },
-          { label: 'بخش فنی و VPS', value: 'چند روز تمرین برای افراد غیرفنی' },
+          { label: 'بخش فنی و VPS', value: 'روال یادگرفتنی کار با سرور اختصاصی و مرورگر مجزا' },
           { label: 'شفافیت اعداد', value: 'اطلاعات جای‌گذاری پیش از انتشار' },
         ]
       : [
           { label: 'English Requirement', value: 'AI makes English a smaller barrier' },
-          { label: 'Tech Curve', value: 'Remote VPS basics learned in a few days' },
+          { label: 'Tech Curve', value: 'Learnable remote VPS and isolated browser routine' },
           { label: 'Data Transparency', value: 'Bracketed [PLACEHOLDER] slots pre-launch' },
         ];
+
+  const heroPillars = DRAFT_MODE ? allPillars : allPillars.slice(0, 2);
 
   return (
     <section
@@ -83,7 +86,9 @@ const HeroBento: React.FC = () => {
               <span className="inline-flex items-center min-h-[32px] px-3 py-1 rounded-full bg-accent-soft border border-accent/20 text-xs font-semibold text-accent">
                 {hero.sideHustleTag}
               </span>
-              <span className="text-xs text-ink-muted">{hero.draftNotice}</span>
+              {DRAFT_MODE && (
+                <span className="text-xs text-ink-muted">{hero.draftNotice}</span>
+              )}
             </div>
 
             {/* Word-only staggered rise (never split by character) */}
@@ -155,16 +160,31 @@ const HeroBento: React.FC = () => {
             <div className="rounded-panel bg-surface border border-border p-2.5 shadow-lift">
               <div className="overflow-hidden rounded-card bg-surface-sand aspect-[16/10]">
                 {!bgFailed ? (
-                  <img
-                    src={EDITORIAL_ASSETS.heroWorkspace}
-                    alt=""
-                    width={1376}
-                    height={768}
-                    fetchPriority="high"
-                    referrerPolicy="no-referrer"
-                    onError={() => setBgFailed(true)}
-                    className="w-full h-full object-cover hero-parallax-img"
-                  />
+                  <picture>
+                    <source
+                      type="image/avif"
+                      srcSet={EDITORIAL_ASSETS.heroWorkspaceSrcSetAvif}
+                      sizes="(max-width: 1023px) calc(100vw - 2rem), 40vw"
+                    />
+                    <source
+                      type="image/webp"
+                      srcSet={EDITORIAL_ASSETS.heroWorkspaceSrcSetWebp}
+                      sizes="(max-width: 1023px) calc(100vw - 2rem), 40vw"
+                    />
+                    <img
+                      src={EDITORIAL_ASSETS.heroWorkspace}
+                      srcSet={EDITORIAL_ASSETS.heroWorkspaceSrcSetJpg}
+                      sizes="(max-width: 1023px) calc(100vw - 2rem), 40vw"
+                      alt=""
+                      width={1376}
+                      height={768}
+                      fetchPriority="high"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                      onError={() => setBgFailed(true)}
+                      className="w-full h-full object-cover hero-parallax-img"
+                    />
+                  </picture>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-accent-soft text-accent font-display text-sm font-semibold p-6 text-center">
                     {hero.sideHustleTag}
@@ -195,7 +215,7 @@ const HeroBento: React.FC = () => {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={hero.searchPlaceholder}
               aria-label={hero.searchPlaceholder}
-              className="flex-1 min-h-[44px] px-2 bg-transparent text-sm text-ink placeholder:text-ink-muted/80 focus:outline-none focus-visible:ring-0 min-w-0"
+              className="flex-1 min-h-[44px] px-2 bg-transparent text-sm text-ink placeholder:text-ink-muted focus:outline-none focus-visible:ring-0 min-w-0"
             />
             <Button type="submit" variant="primary" size="sm" className="shrink-0">
               {hero.searchButtonLabel}
@@ -255,7 +275,11 @@ const HeroBento: React.FC = () => {
         </div>
 
         {/* Proof Strip Beneath */}
-        <div className="mt-8 pt-6 border-t border-border grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8 text-start">
+        <div
+          className={`mt-8 pt-6 border-t border-border grid grid-cols-1 gap-5 md:gap-8 text-start ${
+            DRAFT_MODE ? 'md:grid-cols-3' : 'md:grid-cols-2'
+          }`}
+        >
           {heroPillars.map((pillar) => (
             <div key={pillar.label} className="flex items-start gap-3">
               <span

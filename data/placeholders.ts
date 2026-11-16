@@ -1,4 +1,3 @@
-import heroWorkspace from '../src/assets/images/hero_studio_workspace_1794757387149.jpg';
 import {
   PlaceholderCaseRecord,
   PlaceholderPackage,
@@ -14,8 +13,16 @@ import {
  */
 
 export const EDITORIAL_ASSETS = {
-  sonaPortrait: '/assets/aistudio/photo_2026-11-15_09-40-20_d8c49589.jpg',
-  heroWorkspace,
+  sonaPortrait: '/assets/aistudio/sona-portrait.jpg',
+  sonaPortraitWebp: '/assets/aistudio/sona-portrait.webp',
+  sonaPortraitAvif: '/assets/aistudio/sona-portrait.avif',
+  heroWorkspace: '/assets/hero/hero-workspace-1024.jpg',
+  heroWorkspaceSrcSetAvif:
+    '/assets/hero/hero-workspace-640.avif 640w, /assets/hero/hero-workspace-1024.avif 1024w, /assets/hero/hero-workspace-1376.avif 1376w',
+  heroWorkspaceSrcSetWebp:
+    '/assets/hero/hero-workspace-640.webp 640w, /assets/hero/hero-workspace-1024.webp 1024w, /assets/hero/hero-workspace-1376.webp 1376w',
+  heroWorkspaceSrcSetJpg:
+    '/assets/hero/hero-workspace-640.jpg 640w, /assets/hero/hero-workspace-1024.jpg 1024w, /assets/hero/hero-workspace-1376.jpg 1376w',
 };
 
 export const PLACEHOLDER_PROFILE = {

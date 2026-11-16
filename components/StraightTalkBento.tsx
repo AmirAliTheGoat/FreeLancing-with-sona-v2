@@ -134,13 +134,21 @@ const StraightTalkBento: React.FC = () => {
               >
                 <div className="aspect-[5/4] rounded-card overflow-hidden bg-surface-sand border border-border mb-5">
                   {!imgError ? (
-                    <img
-                      src={EDITORIAL_ASSETS.sonaPortrait}
-                      alt={st.portraitName}
-                      referrerPolicy="no-referrer"
-                      onError={() => setImgError(true)}
-                      className="w-full h-full object-cover object-[50%_22%]"
-                    />
+                    <picture>
+                      <source type="image/avif" srcSet={EDITORIAL_ASSETS.sonaPortraitAvif} />
+                      <source type="image/webp" srcSet={EDITORIAL_ASSETS.sonaPortraitWebp} />
+                      <img
+                        src={EDITORIAL_ASSETS.sonaPortrait}
+                        alt={st.portraitName}
+                        width={640}
+                        height={640}
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        onError={() => setImgError(true)}
+                        className="w-full h-full object-cover object-[50%_22%]"
+                      />
+                    </picture>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center font-display font-bold text-ink-muted">
                       {st.portraitName}

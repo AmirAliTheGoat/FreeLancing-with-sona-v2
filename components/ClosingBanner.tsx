@@ -39,7 +39,7 @@ const ClosingBanner: React.FC = () => {
                   {banner.headingSerif}
                 </span>
               </h2>
-              <p className="text-base sm:text-lg text-white/85 leading-relaxed mb-8 max-w-xl text-pretty">
+              <p className="text-base sm:text-lg text-white/95 leading-relaxed mb-8 max-w-xl text-pretty">
                 {banner.subtitle}
               </p>
               <Button
@@ -62,13 +62,21 @@ const ClosingBanner: React.FC = () => {
             <Reveal delayMs={100}>
               <div className="w-60 sm:w-72 aspect-square rounded-panel overflow-hidden bg-obsidian-card border border-white/25 shadow-float">
                 {!imgError ? (
-                  <img
-                    src={EDITORIAL_ASSETS.sonaPortrait}
-                    alt={t.straightTalk.portraitName}
-                    referrerPolicy="no-referrer"
-                    onError={() => setImgError(true)}
-                    className="w-full h-full object-cover object-[50%_22%]"
-                  />
+                  <picture>
+                    <source type="image/avif" srcSet={EDITORIAL_ASSETS.sonaPortraitAvif} />
+                    <source type="image/webp" srcSet={EDITORIAL_ASSETS.sonaPortraitWebp} />
+                    <img
+                      src={EDITORIAL_ASSETS.sonaPortrait}
+                      alt={t.straightTalk.portraitName}
+                      width={640}
+                      height={640}
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                      onError={() => setImgError(true)}
+                      className="w-full h-full object-cover object-[50%_22%]"
+                    />
+                  </picture>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center font-display font-bold text-white/75 text-2xl">
                     Sona

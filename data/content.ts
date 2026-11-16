@@ -5,6 +5,9 @@ export interface DossierContent {
     title: string;
     description: string;
   };
+  a11y: {
+    skipToContent: string;
+  };
   nav: NavItem[];
   header: {
     cta: string;
@@ -162,6 +165,9 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
       description:
         'راهنمای عملی سونا برای کار در آپورک و فایور از ایران: عادت‌های امن، استفاده از ابزارهای هوش مصنوعی و برآورد هزینه‌های ماهانه.',
     },
+    a11y: {
+      skipToContent: 'پرش به محتوا',
+    },
     nav: [
       { label: 'نقشه راه', href: '#straight-talk' },
       { label: 'قوانین و هزینه', href: '#reality' },
@@ -281,13 +287,13 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
       kycItems: [
         {
           metric: 'عادت ۰۱',
-          title: 'ورود انحصاری از طریق VPS',
-          detail: 'اپلیکیشن موبایل را نصب نکنید و همواره تنها از داخل سرور اختصاصی خود وارد شوید تا نشانی آی‌پی شما ثابت بماند.',
+          title: 'ورود یکدست فقط با VPS',
+          detail: 'اپ موبایل را نصب نکنید و فقط از داخل سرور اختصاصی وارد شوید تا آیپی شما همیشه یکدست بماند.',
         },
         {
           metric: 'طبیعی و رایج',
           title: 'احراز هویت در نخستین برداشت',
-          detail: 'درخواست تایید مدرک در برداشت‌های اولیه روندی عادی در پلتفرم‌هاست و آماده‌سازی پیشین مدارک، عبور از این مرحله را هموار می‌کند.',
+          detail: 'درخواست تایید هویت در برداشت‌های اولیه روندی عادی است و برای عبور از آن به مدرک هویتی معتبر شخصی خودتان نیاز دارید.',
         },
         {
           metric: 'قانون پلتفرم',
@@ -299,12 +305,12 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
         {
           metric: '$12–$22 / ماه',
           title: 'سرور مجازی اختصاصی (VPS)',
-          detail: 'محیط کار ریموت اختصاصی شما با موقعیت ثابت و دسترسی پایدار در تمام طول ماه.',
+          detail: 'محیط ثابت کار شما با آی‌پی مشخص و دسترسی همیشگی.',
         },
         {
           metric: '$10–$25 / ماه',
           title: 'آی‌پی مسکونی تمیز',
-          detail: 'پایداری بیشتر هنگام ثبت‌نام، مراحل تایید هویت و راه‌اندازی سرویس‌ها در پلتفرم.',
+          detail: 'کمک می‌کند مراحل ثبت‌نام، تایید هویت و تنظیم گیگ‌ها بدون حساسیت انجام شود.',
         },
         {
           metric: '$15–$40 / ماه',
@@ -319,9 +325,9 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
           detail: 'حساب‌های تازه در پی‌پل و فایور معمولاً درآمد سفارش‌های اولیه را پیش از آزادسازی، حدود ۲ تا ۳ هفته در وضعیت بررسی نگه می‌دارند.',
         },
         {
-          metric: '۱۰٪ تا ۲۰٪',
-          title: 'کارمزد استاندارد پلتفرم‌ها',
-          detail: 'فایور ۲۰ درصد و آپورک حدود ۱۰ درصد کارمزد کسر می‌کنند؛ هنگام نرخ‌گذاری این درصد را در قیمت خود لحاظ کنید.',
+          metric: '۰٪–۱۵٪ آپورک · ۲۰٪ فایور',
+          title: 'کارمزد متغیر و ثابت پلتفرم‌ها',
+          detail: 'آپورک برای هر قرارداد کارمزد متغیر ۰ تا ۱۵ درصد دارد که پیش از ارسال پروپوزال نمایش داده و برای همان قرارداد قفل می‌شود و فایور ۲۰ درصد کسر می‌کند؛ نرخ خود را با در نظر گرفتن بالاترین کارمزد محتمل محاسبه کنید.',
         },
         {
           metric: 'تبدیل صرافی',
@@ -414,9 +420,9 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
         },
         {
           id: 'ongoing-costs',
-          question: 'هزینه‌های جاری ماهانه شامل چه مواردی است؟',
+          question: 'هزینه‌های جاری ماهانه دقیقاً چه چیزهایی هستند؟',
           answer: [
-            'هزینه‌های مستمر شامل تمدید سرور مجازی (VPS)، آی‌پی مسکونی، اعتبار ارسال پیشنهاد (Connects) در آپورک، نگهداری شماره فعال و کارمزد تبدیل صرافی است که برآورد آن‌ها در بخش هزینه‌های ماهانه آمده است.',
+            'تمدید ماهانه سرور مجازی (VPS)، پروکسی آی‌پی مسکونی، خرید Connects در آپورک و چند درصد کارمزد صرافی هنگام نقد کردن.',
           ],
           keywords: ['هزینه', 'ماهانه', 'vps', 'کانکت', 'تمدید'],
         },
@@ -501,6 +507,9 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
       title: 'Sona | Practical Guide to Global Freelancing from Iran (2026)',
       description:
         'A practical guide to working on Upwork and Fiverr from Iran: account safety habits, AI-assisted communication, learnable remote workflows, and monthly costs.',
+    },
+    a11y: {
+      skipToContent: 'Skip to content',
     },
     nav: [
       { label: 'Playbook', href: '#straight-talk' },
@@ -622,12 +631,12 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
         {
           metric: 'Habit 01',
           title: 'Log In Strictly via Your VPS',
-          detail: 'Avoid mobile apps and sign in exclusively from your dedicated VPS so your IP location stays consistent.',
+          detail: 'Skip mobile apps and keep logins inside your dedicated VPS so your IP footprint stays steady.',
         },
         {
           metric: 'Normal Step',
           title: 'First-Payout ID Verification',
-          detail: 'Platforms routinely request identity checks around early withdrawals, so preparing clean documents ahead of time keeps the step smooth.',
+          detail: 'Platforms routinely request identity checks around early withdrawals, which require your own valid government ID—have it ready before starting.',
         },
         {
           metric: 'Platform Rule',
@@ -639,12 +648,12 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
         {
           metric: '$12–$22 / mo',
           title: 'Dedicated VPS Hosting',
-          detail: 'Your consistent remote workspace with a steady location, renewed on a monthly cycle.',
+          detail: 'Your consistent remote workspace with a steady location—easy to renew monthly.',
         },
         {
           metric: '$10–$25 / mo',
           title: 'Clean Residential IP Proxy',
-          detail: 'Added connection stability during account onboarding, verification checks, and gig publishing.',
+          detail: 'Extra stability during onboarding, verification checks, and gig publishing.',
         },
         {
           metric: '$15–$40 / mo',
@@ -659,9 +668,9 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
           detail: 'New PayPal and Fiverr accounts typically hold initial earnings for 2–3 weeks while account history settles.',
         },
         {
-          metric: '10%–20%',
-          title: 'Standard Marketplace Cut',
-          detail: 'Fiverr takes 20% and Upwork roughly 10%, so build those platform fees into your project rates from the start.',
+          metric: '0%–15% Upwork · 20% Fiverr',
+          title: 'Variable & Platform Fee Cuts',
+          detail: 'Upwork charges a variable 0%–15% per contract (shown before you submit a proposal and locked for that contract), while Fiverr takes a flat 20%—price your rate using the highest fee that applies.',
         },
         {
           metric: 'FX Spread',
@@ -754,9 +763,9 @@ export const DOSSIER_CONTENT: Record<Language, DossierContent> = {
         },
         {
           id: 'ongoing-costs',
-          question: 'What recurring monthly bills should I plan for?',
+          question: 'What recurring bills should I plan for?',
           answer: [
-            'Ongoing expenses include monthly VPS hosting, residential IP renewal, Upwork Connects, active SIM upkeep, and exchange conversion spreads—see the Monthly Bills section above for current estimates.',
+            'Monthly VPS hosting, residential IP renewal, Upwork Connects when pitching jobs, and local exchange conversion spreads when cashing out.',
           ],
           keywords: ['cost', 'monthly', 'vps', 'connects', 'proxy'],
         },

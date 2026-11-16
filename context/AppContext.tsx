@@ -88,6 +88,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (ogDesc) {
       ogDesc.setAttribute('content', DOSSIER_CONTENT[lang].meta.description);
     }
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if (ogLocale) {
+      ogLocale.setAttribute('content', lang === 'fa' ? 'fa_IR' : 'en_US');
+    }
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) {
+      twitterTitle.setAttribute('content', DOSSIER_CONTENT[lang].meta.title);
+    }
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) {
+      twitterDesc.setAttribute('content', DOSSIER_CONTENT[lang].meta.description);
+    }
   }, [lang]);
 
   const applyLangTransition = (next: Language) => {
