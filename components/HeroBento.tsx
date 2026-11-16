@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import { EDITORIAL_ASSETS } from '../data/placeholders';
 
 const HeroBento: React.FC = () => {
-  const { lang, setLang, t, openBookingModal } = useApp();
+  const { lang, t, openBookingModal } = useApp();
   const hero = t.hero;
 
   const [query, setQuery] = useState('');
@@ -13,6 +13,15 @@ const HeroBento: React.FC = () => {
   const [bgFailed, setBgFailed] = useState(false);
 
   const ArrowIcon = lang === 'fa' ? ArrowLeft : ArrowRight;
+
+  const boldWords = useMemo(
+    () => hero.headlineBold.trim().split(/\s+/).filter(Boolean),
+    [hero.headlineBold]
+  );
+  const serifWords = useMemo(
+    () => hero.headlineSerif.trim().split(/\s+/).filter(Boolean),
+    [hero.headlineSerif]
+  );
 
   const activeTopic = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -52,104 +61,132 @@ const HeroBento: React.FC = () => {
   return (
     <section
       id="top"
-      className="relative pt-20 pb-8 md:pt-24 md:pb-10 bg-obsidian text-white overflow-hidden"
+      className="relative pt-24 pb-12 md:pt-28 md:pb-16 bg-surface-paper text-ink overflow-hidden border-b border-border"
     >
-      {/* Full-bleed Architectural Studio Backdrop + Measured Contrast Scrim */}
-      {!bgFailed && (
-        <img
-          src={EDITORIAL_ASSETS.heroWorkspace}
-          alt=""
-          aria-hidden="true"
-          referrerPolicy="no-referrer"
-          onError={() => setBgFailed(true)}
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+      {/* Ambient Accent Mesh Gradient (transform-only drift, paused under reduced motion) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="animate-mesh-drift absolute -top-28 -inset-x-16 h-[28rem] opacity-75"
+          style={{
+            background:
+              'radial-gradient(48% 58% at 18% 28%, var(--color-accent-soft, #eaf4f2) 0%, transparent 72%), radial-gradient(42% 52% at 84% 22%, rgba(21, 99, 88, 0.08) 0%, transparent 70%), radial-gradient(50% 45% at 55% 78%, var(--surface-sand, #eeede8) 0%, transparent 75%)',
+          }}
         />
-      )}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-obsidian"
-      />
+        <div className="bg-editorial-grain absolute inset-0 opacity-[0.035]" />
+      </div>
 
-      <div className="relative z-10 max-w-page mx-auto px-6 lg:px-8">
-        {/* Centered Squarespace Editorial Hero Lockup */}
-        <div className="flex flex-col items-center text-center mb-5 animate-enter-up">
-          {/* Architectural Language Switch */}
-          <div
-            className="inline-flex items-center gap-1 border-[1.5px] border-white/25 bg-black/50 backdrop-blur-md rounded-control p-1 mb-3.5"
-            role="group"
-            aria-label={t.footer.languageLabel}
-          >
-            <button
-              type="button"
-              onClick={() => setLang('fa')}
-              aria-pressed={lang === 'fa'}
-              className={`px-4 py-1.5 text-xs font-semibold rounded-[4px] transition-all duration-200 whitespace-nowrap ${
-                lang === 'fa'
-                  ? 'bg-white text-ink shadow-sm'
-                  : 'text-white/75 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              فارسی
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang('en')}
-              aria-pressed={lang === 'en'}
-              className={`px-4 py-1.5 text-xs font-semibold rounded-[4px] transition-all duration-200 whitespace-nowrap ${
-                lang === 'en'
-                  ? 'bg-white text-ink shadow-sm'
-                  : 'text-white/75 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              English
-            </button>
+      <div className="relative z-10 max-w-page mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Editorial Grid: Typographic Lockup + Framed Workspace Image */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          <div className="lg:col-span-7 text-start space-y-5">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center min-h-[32px] px-3 py-1 rounded-full bg-accent-soft border border-accent/20 text-xs font-semibold text-accent">
+                {hero.sideHustleTag}
+              </span>
+              <span className="text-xs text-ink-muted">{hero.draftNotice}</span>
+            </div>
+
+            {/* Word-only staggered rise (never split by character) */}
+            <h1 className="font-display text-fluid-display font-extrabold text-ink leading-[1.08] tracking-tight text-balance">
+              {boldWords.map((word, idx) => (
+                <React.Fragment key={`${lang}-b-${idx}`}>
+                  <span
+                    className="inline-block animate-word-rise"
+                    style={{ animationDelay: `${idx * 45}ms` }}
+                  >
+                    {word}
+                  </span>{' '}
+                </React.Fragment>
+              ))}
+              <span className="font-serif-accent text-accent">
+                {serifWords.map((word, idx) => (
+                  <React.Fragment key={`${lang}-s-${idx}`}>
+                    <span
+                      className="inline-block animate-word-rise"
+                      style={{ animationDelay: `${(boldWords.length + idx) * 45}ms` }}
+                    >
+                      {word}
+                    </span>
+                    {idx < serifWords.length - 1 ? ' ' : ''}
+                  </React.Fragment>
+                ))}
+              </span>
+            </h1>
+
+            <p className="text-fluid-body text-ink-muted leading-relaxed max-w-2xl text-pretty">
+              {hero.subheadline}
+            </p>
+
+            {/* Primary (accent filled) + Secondary (ghost) CTA Row */}
+            <div className="space-y-2.5 pt-1">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  variant="accent"
+                  size="lg"
+                  onClick={() => openBookingModal({ packageId: 'advisory-audit' })}
+                  className="gap-2.5"
+                >
+                  <span>{hero.primaryCta}</span>
+                  <ArrowIcon
+                    size={17}
+                    aria-hidden="true"
+                    className="transition-transform duration-150 group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5"
+                  />
+                </Button>
+
+                <a
+                  href="#packages"
+                  className="group inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-control border-[1.5px] border-transparent text-sm sm:text-base font-semibold text-ink-muted hover:text-ink hover:border-border hover:bg-surface-warm transition-[transform,color,background-color,border-color] duration-250 ease-out-expo hover:-translate-y-[1px] active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 whitespace-nowrap"
+                >
+                  <span>{t.straightTalk.ctaLabel}</span>
+                  <ArrowIcon
+                    size={16}
+                    aria-hidden="true"
+                    className="transition-transform duration-150 group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5"
+                  />
+                </a>
+              </div>
+              <p className="text-xs text-ink-muted">{hero.helperNote}</p>
+            </div>
           </div>
 
-          <p className="text-xs font-medium tracking-wide text-white/75 mb-1">
-            {hero.sideHustleTag}
-          </p>
-          <p className="text-xs text-white/60 mb-3 max-w-xl">{hero.draftNotice}</p>
-
-          <h1 className="font-display text-[clamp(2.15rem,4.4vw,3.9rem)] font-extrabold text-white leading-[1.08] tracking-tight max-w-4xl text-balance mb-3">
-            {hero.headlineBold}
-            <span className="font-serif-accent italic font-normal text-white/95">
-              {hero.headlineSerif}
-            </span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-2xl mb-5">
-            {hero.subheadline}
-          </p>
-
-          <div className="flex flex-col items-center gap-1.5">
-            <Button
-              variant="white"
-              size="lg"
-              onClick={() => openBookingModal({ packageId: 'advisory-audit' })}
-              className="gap-2.5"
-            >
-              <span>{hero.primaryCta}</span>
-              <ArrowIcon
-                size={17}
-                className="transition-transform duration-150 group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5"
-              />
-            </Button>
-            <p className="text-xs text-white/65 mt-0.5">{hero.helperNote}</p>
+          {/* Framed Editorial Workspace Card with Subtle view() Parallax */}
+          <div className="lg:col-span-5">
+            <div className="rounded-panel bg-surface border border-border p-2.5 shadow-lift">
+              <div className="overflow-hidden rounded-card bg-surface-sand aspect-[16/10]">
+                {!bgFailed ? (
+                  <img
+                    src={EDITORIAL_ASSETS.heroWorkspace}
+                    alt=""
+                    width={1376}
+                    height={768}
+                    fetchPriority="high"
+                    referrerPolicy="no-referrer"
+                    onError={() => setBgFailed(true)}
+                    className="w-full h-full object-cover hero-parallax-img"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-accent-soft text-accent font-display text-sm font-semibold p-6 text-center">
+                    {hero.sideHustleTag}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Crisp Architectural Topic Explorer Panel */}
+        {/* Clean "Ask" Topic Explorer Card */}
         <div
           style={{ animationDelay: '90ms' }}
-          className="max-w-3xl mx-auto animate-enter-up bg-black/65 backdrop-blur-md border border-white/15 rounded-panel p-4 sm:p-5 shadow-elevated"
+          className="mt-8 md:mt-10 animate-enter-up bg-surface border border-border rounded-panel p-4 sm:p-6 shadow-soft"
         >
           <form
             onSubmit={handleSearchSubmit}
-            className="flex items-center p-1.5 bg-white/[0.07] border-[1.5px] border-white/25 rounded-control focus-within:border-white focus-within:bg-white/[0.11] transition-all duration-200"
+            className="flex items-center gap-2 p-1.5 bg-surface-paper border-[1.5px] border-border rounded-control focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20 transition-[border-color,box-shadow,background-color] duration-250"
           >
             <Search
-              size={16}
-              className="ltr:ml-3.5 rtl:mr-3.5 text-white/65 shrink-0"
+              size={17}
+              className="ms-3 text-ink-muted shrink-0"
               aria-hidden="true"
             />
             <input
@@ -158,33 +195,31 @@ const HeroBento: React.FC = () => {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={hero.searchPlaceholder}
               aria-label={hero.searchPlaceholder}
-              className="flex-1 h-11 px-3 bg-transparent text-sm text-white placeholder:text-white/55 focus:outline-none min-w-0"
+              className="flex-1 min-h-[44px] px-2 bg-transparent text-sm text-ink placeholder:text-ink-muted/80 focus:outline-none focus-visible:ring-0 min-w-0"
             />
-            <button
-              type="submit"
-              className="h-11 px-6 bg-white text-ink border-[1.5px] border-white hover:bg-neutral-100 hover:-translate-y-[0.5px] text-xs font-semibold transition-all duration-200 shrink-0 rounded-[4px] shadow-sm active:translate-y-0 active:scale-[0.985]"
-            >
+            <Button type="submit" variant="primary" size="sm" className="shrink-0">
               {hero.searchButtonLabel}
-            </button>
+            </Button>
           </form>
 
-          {/* Suggested Topic Selector Strip */}
-          <div className="flex flex-wrap items-center gap-2 mt-4 pb-4 border-b border-white/15">
-            <span className="text-xs text-white/60 font-medium">{hero.suggestedLabel}</span>
+          {/* Animated Pill Topic Selector */}
+          <div className="flex flex-wrap items-center gap-2 mt-4 pb-4 border-b border-border">
+            <span className="text-xs text-ink-muted font-medium me-1">{hero.suggestedLabel}</span>
             {hero.topics.map((topic) => {
               const isSelected = activeTopic.id === topic.id;
               return (
                 <button
                   key={topic.id}
                   type="button"
+                  aria-pressed={isSelected}
                   onClick={() => {
                     setQuery('');
                     setSelectedTopicId(topic.id);
                   }}
-                  className={`px-4 py-1.5 text-xs font-medium rounded-control border-[1.5px] transition-all duration-200 whitespace-nowrap ${
+                  className={`min-h-[44px] px-4 py-2 text-xs font-semibold rounded-full border-[1.5px] transition-[transform,background-color,border-color,color,box-shadow] duration-250 ease-out-expo whitespace-nowrap active:scale-[0.98] motion-reduce:transition-none ${
                     isSelected
-                      ? 'bg-white text-ink border-white shadow-sm'
-                      : 'bg-white/[0.04] text-white/80 border-white/20 hover:border-white/60 hover:bg-white/[0.1] hover:text-white'
+                      ? 'bg-accent text-white border-accent shadow-soft scale-[1.01] motion-reduce:scale-100'
+                      : 'bg-surface-warm text-ink-muted border-border hover:border-ink/35 hover:bg-surface-sand hover:text-ink'
                   }`}
                 >
                   {topic.chip}
@@ -193,37 +228,44 @@ const HeroBento: React.FC = () => {
             })}
           </div>
 
-          {/* Live Answer Output */}
+          {/* Cross-fading Answer Panel */}
           <div
-            key={activeTopic.id}
+            key={`${lang}-${activeTopic.id}`}
             className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-hint-swap"
           >
-            <div className="text-start min-w-0">
-              <p className="text-xs font-semibold text-white/60 mb-1">{activeTopic.chip}</p>
-              <h2 className="font-display text-base sm:text-lg font-bold text-white mb-1">
+            <div className="text-start min-w-0 space-y-1">
+              <p className="text-xs font-semibold text-accent">{activeTopic.chip}</p>
+              <h2 className="font-display text-base sm:text-lg font-bold text-ink">
                 {activeTopic.title}
               </h2>
-              <p className="text-sm text-white/80 leading-relaxed">{activeTopic.answer}</p>
+              <p className="text-sm text-ink-muted leading-relaxed">{activeTopic.answer}</p>
             </div>
             <a
               href={activeTopic.targetHref}
-              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-white/[0.06] border-[1.5px] border-white/30 rounded-control text-xs font-semibold text-white hover:bg-white hover:text-ink hover:border-white hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0 self-start sm:self-center"
+              className="group inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 bg-surface-warm border-[1.5px] border-border rounded-control text-xs font-semibold text-ink hover:bg-accent hover:text-white hover:border-accent hover:-translate-y-0.5 transition-[transform,background-color,border-color,color] duration-250 ease-out-expo motion-reduce:transition-none motion-reduce:hover:translate-y-0 whitespace-nowrap shrink-0 self-start sm:self-center"
             >
               <span>{activeTopic.ctaLabel}</span>
               <ArrowIcon
                 size={14}
-                className="transition-transform duration-200 group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5"
+                aria-hidden="true"
+                className="transition-transform duration-150 group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5"
               />
             </a>
           </div>
         </div>
 
-        {/* Bottom Architectural Reality Bar echoing Squarespace hero foundation strip */}
-        <div className="mt-6 pt-5 border-t border-white/15 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 text-center md:text-start">
+        {/* Proof Strip Beneath */}
+        <div className="mt-8 pt-6 border-t border-border grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8 text-start">
           {heroPillars.map((pillar) => (
-            <div key={pillar.label} className="space-y-0.5">
-              <p className="text-xs text-white/55 font-medium">{pillar.label}</p>
-              <p className="text-sm font-semibold text-white/95">{pillar.value}</p>
+            <div key={pillar.label} className="flex items-start gap-3">
+              <span
+                aria-hidden="true"
+                className="mt-1.5 h-2 w-2 rounded-full bg-accent shrink-0"
+              />
+              <div className="space-y-0.5 min-w-0">
+                <p className="text-xs text-ink-muted font-medium">{pillar.label}</p>
+                <p className="text-sm font-semibold text-ink leading-snug">{pillar.value}</p>
+              </div>
             </div>
           ))}
         </div>

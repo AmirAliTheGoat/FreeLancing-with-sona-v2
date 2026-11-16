@@ -54,9 +54,9 @@
     --surface-warm: oklch(0.968 0.005 90);
     --surface-sand: oklch(0.942 0.007 88);
     --surface-stone: oklch(0.912 0.009 88);
-    --color-accent: oklch(0.47 0.095 178);
-    --color-accent-hover: oklch(0.40 0.095 178);
-    --color-accent-soft: oklch(0.95 0.02 178);
+    --color-accent: oklch(0.452 0.074 181);
+    --color-accent-hover: oklch(0.386 0.064 181);
+    --color-accent-soft: oklch(0.959 0.011 183);
   }
 }
 
@@ -178,14 +178,26 @@
   }
 }
 
-@keyframes revealRise {
+@keyframes wordRise {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes meshDrift {
+  0% {
+    transform: translate3d(0%, 0%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -2%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0%, 0%, 0) scale(1);
   }
 }
 
@@ -197,7 +209,19 @@
   animation: hintFade var(--dur-fast, 150ms) var(--ease-out-expo) both;
 }
 
-/* Reveal: IntersectionObserver fallback path */
+.animate-word-rise {
+  animation: wordRise var(--dur-slow, 450ms) var(--ease-out-expo) both;
+}
+
+.animate-mesh-drift {
+  animation: meshDrift 18s ease-in-out infinite;
+}
+
+.bg-editorial-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Reveal: IntersectionObserver + CSS transitions on all browsers (once only) */
 .reveal-item {
   opacity: 0;
   transform: translateY(20px);
@@ -212,22 +236,60 @@
   transform: translateY(0);
 }
 
-/* Reveal: CSS scroll-driven path when supported */
-@supports (animation-timeline: view()) {
-  .reveal-item {
+/* Sticky header scroll-progress bar (hidden fallback when unsupported) */
+.scroll-progress-bar {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+[dir='rtl'] .scroll-progress-bar {
+  transform-origin: 100% 50%;
+}
+
+[dir='ltr'] .scroll-progress-bar {
+  transform-origin: 0% 50%;
+}
+
+@supports (animation-timeline: scroll()) {
+  @keyframes scrollProgressGrow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .scroll-progress-bar {
     opacity: 1;
-    transform: none;
-    transition: none;
-    animation-name: revealRise;
-    animation-duration: var(--dur-reveal, 700ms);
-    animation-timing-function: var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+    animation-name: scrollProgressGrow;
+    animation-timing-function: linear;
     animation-fill-mode: both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 24%;
+    animation-timeline: scroll(root block);
   }
 }
 
-/* View Transitions prepared for language switch (opt-in later) */
+/* Hero image subtle parallax via view() timeline (static fallback when unsupported) */
+@supports (animation-timeline: view()) {
+  @keyframes heroParallax {
+    from {
+      transform: translateY(-2.5%) scale(1.05);
+    }
+    to {
+      transform: translateY(2.5%) scale(1.05);
+    }
+  }
+
+  .hero-parallax-img {
+    animation-name: heroParallax;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+}
+
+/* View Transitions prepared for language switch */
 @keyframes vtFadeOut {
   from {
     opacity: 1;
@@ -296,11 +358,19 @@
 
   .animate-enter-up,
   .animate-hint-swap,
+  .animate-word-rise,
+  .animate-mesh-drift,
+  .hero-parallax-img,
   .reveal-item {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .scroll-progress-bar {
+    animation: none !important;
+    opacity: 0 !important;
   }
 
   ::view-transition-old(root),

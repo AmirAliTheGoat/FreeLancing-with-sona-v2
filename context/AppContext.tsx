@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { DOSSIER_CONTENT, DossierContent } from '../data/content';
 import { ConsultationInquiry, Language } from '../types';
 
@@ -89,8 +90,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [lang]);
 
-  const setLang = (next: Language) => setLangState(next);
-  const toggleLang = () => setLangState((prev) => (prev === 'fa' ? 'en' : 'fa'));
+  const applyLangTransition = (next: Language) => {
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const docWithVT = document as Document & {
+      startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+    };
+
+    if (!prefersReducedMotion && typeof docWithVT.startViewTransition === 'function') {
+      docWithVT.startViewTransition(() => {
+        flushSync(() => {
+          setLangState(next);
+        });
+      });
+      return;
+    }
+
+    setLangState(next);
+  };
+
+  const setLang = (next: Language) => {
+    if (next === lang) return;
+    applyLangTransition(next);
+  };
+
+  const toggleLang = () => applyLangTransition(lang === 'fa' ? 'en' : 'fa');
 
   const openBookingModal = (options?: { packageId?: string }) => {
     setBookingModal({

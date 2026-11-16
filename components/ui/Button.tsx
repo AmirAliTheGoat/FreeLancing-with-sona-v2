@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'brand' | 'white' | 'secondary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'brand' | 'accent' | 'white' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
@@ -21,6 +21,8 @@ export const Button: React.FC<ButtonProps> = ({
       'bg-ink text-white border-[1.5px] border-ink shadow-soft hover:bg-brand-hover hover:border-brand-hover hover:-translate-y-0.5 hover:shadow-lift focus-visible:ring-accent focus-visible:ring-offset-surface',
     brand:
       'bg-ink text-white border-[1.5px] border-ink shadow-soft hover:bg-brand-hover hover:border-brand-hover hover:-translate-y-0.5 hover:shadow-lift focus-visible:ring-accent focus-visible:ring-offset-surface',
+    accent:
+      'bg-accent text-white border-[1.5px] border-accent shadow-soft hover:bg-accent-hover hover:border-accent-hover hover:-translate-y-0.5 hover:shadow-lift focus-visible:ring-accent focus-visible:ring-offset-surface',
     white:
       'bg-white text-ink border-[1.5px] border-white shadow-[0_4px_18px_-4px_rgba(0,0,0,0.45),inset_0_1px_0_#ffffff] hover:bg-surface-warm hover:border-surface-sand hover:-translate-y-0.5 hover:shadow-[0_14px_30px_-6px_rgba(0,0,0,0.6)] focus-visible:ring-white focus-visible:ring-offset-obsidian',
     secondary:
@@ -32,9 +34,9 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const sizes = {
-    sm: 'px-5 py-2.5 text-xs sm:text-sm',
-    md: 'px-6 py-3 text-sm',
-    lg: 'px-8 py-4 text-sm sm:text-base',
+    sm: 'min-h-[44px] px-5 py-2.5 text-xs sm:text-sm',
+    md: 'min-h-[44px] px-6 py-3 text-sm',
+    lg: 'min-h-[48px] px-8 py-3.5 text-sm sm:text-base',
   };
 
   return (

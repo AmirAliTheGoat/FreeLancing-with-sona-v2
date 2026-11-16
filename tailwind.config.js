@@ -48,10 +48,10 @@ export default {
         page: '78rem',
       },
       borderRadius: {
-        control: '0.375rem',
-        field: '0.375rem',
-        card: '0.5rem',
-        panel: '0.75rem',
+        control: '0.625rem',
+        field: '0.625rem',
+        card: '1rem',
+        panel: '1.5rem',
       },
       boxShadow: {
         subtle: 'var(--shadow-subtle)',

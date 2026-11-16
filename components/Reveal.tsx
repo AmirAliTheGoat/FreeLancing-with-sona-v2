@@ -25,12 +25,7 @@ export const Reveal: React.FC<RevealProps> = ({
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const supportsScrollTimeline =
-      typeof CSS !== 'undefined' &&
-      typeof CSS.supports === 'function' &&
-      CSS.supports('animation-timeline: view()');
-
-    if (prefersReducedMotion || supportsScrollTimeline || typeof IntersectionObserver === 'undefined') {
+    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
       setVisible(true);
       return;
     }
