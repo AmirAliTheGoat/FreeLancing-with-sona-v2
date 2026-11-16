@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { DOSSIER_CONTENT, DossierContent } from '../data/content';
 import { ConsultationInquiry, Language } from '../types';
@@ -119,16 +119,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const toggleLang = () => applyLangTransition(lang === 'fa' ? 'en' : 'fa');
 
-  const openBookingModal = (options?: { packageId?: string }) => {
+  const openBookingModal = useCallback((options?: { packageId?: string }) => {
     setBookingModal({
       isOpen: true,
       packageId: options?.packageId ?? 'advisory-audit',
     });
-  };
+  }, []);
 
-  const closeBookingModal = () => {
+  const closeBookingModal = useCallback(() => {
     setBookingModal((prev) => ({ ...prev, isOpen: false }));
-  };
+  }, []);
 
   const addInquiry = (
     payload: Omit<ConsultationInquiry, 'id' | 'createdAt' | 'lang'>

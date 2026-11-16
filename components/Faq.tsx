@@ -1,174 +1,179 @@
-import React, { useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Minus, Plus, Search, X } from 'lucide-react';
-import { Button } from './ui/Button';
+import React, { useMemo, useRef, useState } from 'react';
+import { ChevronDown, Search, X } from 'lucide-react';
+import { Collapsible } from './ui/Collapsible';
 import { Reveal } from './Reveal';
 import { useApp } from '../context/AppContext';
-import { EDITORIAL_ASSETS } from '../data/placeholders';
 import { filterFaqItems } from '../utils/calculations';
 
 const Faq: React.FC = () => {
-  const { lang, t, openBookingModal } = useApp();
+  const { t } = useApp();
   const section = t.faqSection;
-  const banner = t.closingBanner;
 
   const [openId, setOpenId] = useState<string | null>(section.items[0]?.id ?? null);
   const [query, setQuery] = useState<string>('');
-  const [imgError, setImgError] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   const filteredItems = useMemo(
     () => filterFaqItems(section.items, query),
     [query, section.items]
   );
 
-  const ArrowIcon = lang === 'fa' ? ArrowLeft : ArrowRight;
+  const liveAnnouncement = useMemo(() => {
+    if (!query.trim()) return '';
+    if (filteredItems.length === 0) return section.emptyTitle;
+    return `${filteredItems.length} / ${section.items.length}`;
+  }, [query, filteredItems.length, section.items.length, section.emptyTitle]);
+
+  const handleTriggerKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    itemId: string
+  ) => {
+    const key = e.key;
+    if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Home' && key !== 'End') {
+      return;
+    }
+
+    const triggers: HTMLButtonElement[] = listRef.current
+      ? Array.from(listRef.current.querySelectorAll<HTMLButtonElement>('button[data-faq-trigger="true"]'))
+      : [];
+    if (triggers.length === 0) return;
+
+    const currentIndex = triggers.findIndex((btn) => btn.dataset.faqId === itemId);
+    if (currentIndex === -1) return;
+
+    e.preventDefault();
+    let nextIndex = currentIndex;
+    if (key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % triggers.length;
+    } else if (key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+    } else if (key === 'Home') {
+      nextIndex = 0;
+    } else if (key === 'End') {
+      nextIndex = triggers.length - 1;
+    }
+    triggers[nextIndex]?.focus();
+  };
 
   return (
-    <>
-      {/* Band 6: Squarespace Architectural Closing Split Band */}
-      <section className="py-16 md:py-24 bg-surface-muted border-b border-border overflow-hidden">
-        <div className="max-w-page mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
-            <div className="md:col-span-7">
-              <Reveal>
-                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink leading-[1.1] mb-4 text-balance">
-                  {banner.headingBold}
-                  <span className="font-serif-accent italic font-normal">
-                    {banner.headingSerif}
-                  </span>
-                </h2>
-                <p className="text-base sm:text-lg text-ink-muted leading-relaxed mb-7 max-w-xl">
-                  {banner.subtitle}
-                </p>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => openBookingModal({ packageId: 'advisory-audit' })}
-                  className="gap-2.5"
-                >
-                  <span>{banner.cta}</span>
-                  <ArrowIcon
-                    size={17}
-                    className="transition-transform duration-150 group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5"
-                  />
-                </Button>
-              </Reveal>
-            </div>
-
-            <div className="md:col-span-5 flex justify-center md:justify-end">
-              <Reveal delayMs={100}>
-                <div className="w-64 sm:w-72 aspect-square rounded-panel overflow-hidden bg-white border border-border shadow-card">
-                  {!imgError ? (
-                    <img
-                      src={EDITORIAL_ASSETS.sonaPortrait}
-                      alt={t.straightTalk.portraitName}
-                      referrerPolicy="no-referrer"
-                      onError={() => setImgError(true)}
-                      className="w-full h-full object-cover object-[50%_22%]"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center font-display font-bold text-ink-muted">
-                      Sona
-                    </div>
-                  )}
-                </div>
-              </Reveal>
-            </div>
+    <section className="py-16 md:py-24 bg-surface-paper border-b border-border" id="faq">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <Reveal>
+          <div className="mb-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-2">
+              {section.kicker}
+            </p>
+            <h2 className="font-display text-fluid-h2 font-extrabold text-ink text-balance">
+              {section.headingBold}
+              <span className="font-serif-accent italic font-normal text-accent">
+                {section.headingSerif}
+              </span>
+            </h2>
           </div>
+        </Reveal>
+
+        {/* Search Input */}
+        <div className="relative mb-8">
+          <Search
+            size={17}
+            className="absolute top-1/2 -translate-y-1/2 start-4 text-ink-muted pointer-events-none"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={section.searchPlaceholder}
+            aria-label={section.searchPlaceholder}
+            className="w-full min-h-[48px] bg-surface border border-border rounded-control ps-11 pe-12 text-sm text-ink placeholder:text-ink-muted/70 shadow-subtle focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-[border-color,box-shadow] duration-250 motion-reduce:transition-none"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label={section.clearSearch}
+              className="absolute top-1/2 -translate-y-1/2 end-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-control text-ink-muted hover:text-ink hover:bg-surface-warm transition-colors motion-reduce:transition-none"
+            >
+              <X size={16} aria-hidden="true" />
+            </button>
+          )}
         </div>
-      </section>
 
-      {/* Band 7: Clean Editorial Hairline FAQ */}
-      <section className="py-16 md:py-24 bg-white" id="faq">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <Reveal>
-            <div className="mb-8">
-              <p className="text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">
-                {section.kicker}
-              </p>
-              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-ink">
-                {section.headingBold}
-                <span className="font-serif-accent italic font-normal">{section.headingSerif}</span>
-              </h2>
-            </div>
-          </Reveal>
+        {/* Polite announcement of live filtered results (existing copy only) */}
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {liveAnnouncement}
+        </div>
 
-          {/* Search Input */}
-          <div className="relative mb-8">
-            <Search
-              size={17}
-              className="absolute top-1/2 -translate-y-1/2 ltr:left-4 rtl:right-4 text-ink-muted pointer-events-none"
-              aria-hidden="true"
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={section.searchPlaceholder}
-              aria-label={section.searchPlaceholder}
-              className="w-full h-12 bg-surface-muted border-[1.5px] border-border rounded-control ltr:pl-11 ltr:pr-11 rtl:pr-11 rtl:pl-11 text-sm text-ink placeholder:text-ink-muted/70 focus:outline-none focus:bg-white focus:border-ink focus:shadow-subtle transition-all duration-200"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                aria-label={section.clearSearch}
-                className="absolute top-1/2 -translate-y-1/2 ltr:right-3 rtl:left-3 p-1.5 rounded-control text-ink-muted hover:text-ink hover:bg-white transition-colors"
-              >
-                <X size={15} />
-              </button>
-            )}
-          </div>
-
+        <div key={query.trim() || '__all'} className="animate-hint-swap">
           {filteredItems.length === 0 ? (
-            <div className="text-center py-10 px-6 bg-surface-muted rounded-panel border border-border">
+            <div className="text-center py-10 px-6 bg-surface rounded-panel border border-border shadow-soft">
               <p className="text-sm text-ink-muted mb-4">{section.emptyTitle}</p>
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="px-6 py-3 text-xs font-semibold text-white bg-ink border-[1.5px] border-ink rounded-control hover:bg-neutral-800 hover:-translate-y-0.5 shadow-subtle transition-all duration-200"
+                className="min-h-[44px] px-6 py-2.5 text-xs sm:text-sm font-semibold text-white bg-accent border border-accent rounded-full hover:bg-accent-hover transition-colors duration-250 motion-reduce:transition-none"
               >
                 {section.emptyReset}
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-border border-t border-b border-border">
+            <div
+              ref={listRef}
+              className="divide-y divide-border border-t border-b border-border bg-surface/60 rounded-card px-4 sm:px-6"
+            >
               {filteredItems.map((item) => {
                 const isOpen = openId === item.id;
+                const panelId = `faq-panel-${item.id}`;
                 return (
-                  <div key={item.id} className="transition-colors duration-150">
+                  <div
+                    key={item.id}
+                    onKeyDown={(e) => handleTriggerKeyDown(e, item.id)}
+                  >
                     <button
                       type="button"
+                      data-faq-trigger="true"
+                      data-faq-id={item.id}
                       aria-expanded={isOpen}
+                      aria-controls={panelId}
                       onClick={() => setOpenId(isOpen ? null : item.id)}
-                      className="group w-full flex items-center justify-between gap-4 text-start font-semibold text-base sm:text-lg text-ink py-5 hover:text-ink/80 transition-colors"
+                      className="group w-full min-h-[56px] flex items-center justify-between gap-4 text-start font-semibold text-base sm:text-lg text-ink py-5 hover:text-accent transition-colors duration-250 motion-reduce:transition-none"
                     >
                       <span>{item.question}</span>
                       <span
-                        className={`shrink-0 w-8 h-8 rounded-control border-[1.5px] flex items-center justify-center transition-all duration-200 ${
+                        aria-hidden="true"
+                        className={`shrink-0 w-9 h-9 rounded-full border flex items-center justify-center transition-colors duration-250 motion-reduce:transition-none ${
                           isOpen
-                            ? 'bg-ink text-white border-ink'
-                            : 'bg-surface-muted text-ink border-border group-hover:border-ink/50 group-hover:bg-white'
+                            ? 'bg-accent text-white border-accent'
+                            : 'bg-surface-warm text-ink border-border group-hover:border-accent/40 group-hover:text-accent'
                         }`}
                       >
-                        {isOpen ? <Minus size={15} /> : <Plus size={15} />}
+                        <ChevronDown
+                          size={17}
+                          className={`transition-transform duration-250 ease-out-expo motion-reduce:transition-none ${
+                            isOpen ? 'rotate-180' : 'rotate-0'
+                          }`}
+                        />
                       </span>
                     </button>
 
-                    {isOpen && (
-                      <div className="pb-5 text-sm sm:text-base text-ink-muted leading-relaxed space-y-2 animate-hint-swap">
+                    <Collapsible
+                      id={panelId}
+                      isOpen={isOpen}
+                    >
+                      <div className="pb-5 text-sm sm:text-base text-ink-muted leading-relaxed space-y-2.5 text-pretty">
                         {item.answer.map((paragraph, i) => (
                           <p key={i}>{paragraph}</p>
                         ))}
                       </div>
-                    )}
+                    </Collapsible>
                   </div>
                 );
               })}
             </div>
           )}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

@@ -477,6 +477,141 @@
   animation: vtFadeIn var(--dur-base, 250ms) var(--ease-out-expo) both;
 }
 
+/* Native <dialog> modal & mobile bottom-sheet transitions */
+.sona-dialog {
+  display: none;
+}
+
+.sona-dialog[open] {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .sona-dialog[open] {
+    align-items: center;
+    padding: 1rem;
+  }
+}
+
+.sona-dialog::backdrop {
+  background-color: rgba(10, 10, 10, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition:
+    background-color var(--dur-base, 250ms) var(--ease-out-expo),
+    backdrop-filter var(--dur-base, 250ms) var(--ease-out-expo);
+}
+
+.sona-dialog[data-visible='true']::backdrop {
+  background-color: rgba(10, 10, 10, 0.56);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.sona-dialog-panel {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity var(--dur-base, 250ms) var(--ease-out-expo),
+    transform var(--dur-base, 250ms) var(--ease-out-expo);
+}
+
+@media (min-width: 640px) {
+  .sona-dialog-panel {
+    transform: translate3d(0, 10px, 0) scale(0.97);
+  }
+}
+
+.sona-dialog[data-visible='true'] .sona-dialog-panel {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Form validation subtle transform shake */
+@keyframes shakeX {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(-6px, 0, 0);
+  }
+  40% {
+    transform: translate3d(5px, 0, 0);
+  }
+  60% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  80% {
+    transform: translate3d(3px, 0, 0);
+  }
+}
+
+.animate-shake {
+  animation: shakeX 320ms var(--ease-out-expo) both;
+}
+
+/* Modal receipt checkmark stroke-draw */
+@keyframes svgCheckDraw {
+  from {
+    stroke-dashoffset: 36;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-svg-check {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: svgCheckDraw var(--dur-slow, 450ms) var(--ease-out-expo) 80ms both;
+}
+
+/* Footer nav link underline draw (inline-start origin) */
+.footer-link-underline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.footer-link-underline::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0.45rem;
+  height: 1.5px;
+  background-color: var(--color-accent-soft, #eaf4f2);
+  transform: scaleX(0);
+  transition: transform var(--dur-base, 250ms) var(--ease-out-expo);
+}
+
+[dir='rtl'] .footer-link-underline::after {
+  transform-origin: 100% 50%;
+}
+
+[dir='ltr'] .footer-link-underline::after {
+  transform-origin: 0% 50%;
+}
+
+.footer-link-underline:hover::after,
+.footer-link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -517,6 +652,7 @@
   .animate-hint-swap,
   .animate-word-rise,
   .animate-mesh-drift,
+  .animate-shake,
   .hero-parallax-img,
   .reveal-item {
     animation: none !important;
@@ -526,8 +662,16 @@
   }
 
   .collapsible-grid,
-  .svg-check-path {
+  .svg-check-path,
+  .sona-dialog::backdrop,
+  .sona-dialog-panel,
+  .footer-link-underline::after {
     transition: none !important;
+  }
+
+  .animate-svg-check {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
   }
 
   .metric-underline-draw {
