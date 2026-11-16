@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterFaqItems, resolveContactHref } from './calculations';
+import { computeActiveNavHref, filterFaqItems, resolveContactHref } from './calculations';
 import { DOSSIER_CONTENT } from '../data/content';
 
 test('filterFaqItems matches questions, answers, and keywords across EN and FA', () => {
@@ -24,3 +24,74 @@ test('resolveContactHref returns null for bracketed placeholders and links for r
   assert.equal(resolveContactHref('@sona_guide', 'telegram'), 'https://t.me/sona_guide');
   assert.equal(resolveContactHref('sona_guide', 'telegram'), 'https://t.me/sona_guide');
 });
+
+test('computeActiveNavHref resolves active section deterministically across scroll positions', () => {
+  const activationY = 200;
+
+  assert.equal(computeActiveNavHref([], activationY, false), '');
+
+  // Hero view: first section is well below activation threshold
+  assert.equal(
+    computeActiveNavHref(
+      [
+        { href: '#straight-talk', top: 680 },
+        { href: '#reality', top: 1450 },
+        { href: '#packages', top: 2300 },
+        { href: '#records', top: 3200 },
+        { href: '#faq', top: 4400 },
+      ],
+      activationY,
+      false
+    ),
+    ''
+  );
+
+  // Scrolled onto #straight-talk
+  assert.equal(
+    computeActiveNavHref(
+      [
+        { href: '#straight-talk', top: 88 },
+        { href: '#reality', top: 850 },
+        { href: '#packages', top: 1700 },
+        { href: '#records', top: 2600 },
+        { href: '#faq', top: 3800 },
+      ],
+      activationY,
+      false
+    ),
+    '#straight-talk'
+  );
+
+  // Scrolled into gap between #records and #faq (e.g. ClosingBanner): #records remains active
+  assert.equal(
+    computeActiveNavHref(
+      [
+        { href: '#straight-talk', top: -2700 },
+        { href: '#reality', top: -1950 },
+        { href: '#packages', top: -1100 },
+        { href: '#records', top: -420 },
+        { href: '#faq', top: 480 },
+      ],
+      activationY,
+      false
+    ),
+    '#records'
+  );
+
+  // Bottom of page on tall viewports activates the final section (#faq)
+  assert.equal(
+    computeActiveNavHref(
+      [
+        { href: '#straight-talk', top: -3200 },
+        { href: '#reality', top: -2450 },
+        { href: '#packages', top: -1600 },
+        { href: '#records', top: -920 },
+        { href: '#faq', top: 260 },
+      ],
+      activationY,
+      true
+    ),
+    '#faq'
+  );
+});
+

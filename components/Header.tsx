@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useApp } from '../context/AppContext';
+import { computeActiveNavHref } from '../utils/calculations';
 
 interface PillIndicatorState {
   offsetStart: number;
@@ -22,54 +23,107 @@ const Header: React.FC = () => {
 
   const navRef = useRef<HTMLElement | null>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+  const clickLockRef = useRef<{ href: string; timerId: number | null } | null>(null);
+  const prevBodyOverflowRef = useRef<string>('');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 24);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+  const clearClickLock = useCallback(() => {
+    if (clickLockRef.current?.timerId !== null && clickLockRef.current?.timerId !== undefined) {
+      window.clearTimeout(clickLockRef.current.timerId);
+    }
+    clickLockRef.current = null;
   }, []);
 
-  useEffect(() => {
-    const sectionIds = t.nav.map((item) => item.href.replace(/^#/, ''));
-    const elements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
+  const syncScrollState = useCallback(() => {
+    setIsScrolled(window.scrollY > 24);
 
-    if (elements.length === 0 || typeof IntersectionObserver === 'undefined') {
+    const sections = t.nav
+      .map((item) => {
+        const el = document.getElementById(item.href.replace(/^#/, ''));
+        return el ? { href: item.href, top: el.getBoundingClientRect().top } : null;
+      })
+      .filter((item): item is { href: string; top: number } => item !== null);
+
+    if (sections.length === 0) return;
+
+    const activationY = Math.min(220, Math.max(120, Math.round(window.innerHeight * 0.25)));
+    const atBottom =
+      window.scrollY > 0 &&
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 24;
+
+    const computedHref = computeActiveNavHref(sections, activationY, atBottom);
+    const lock = clickLockRef.current;
+
+    if (lock) {
+      if (computedHref === lock.href) {
+        clearClickLock();
+        setActiveHref((prev) => (prev === computedHref ? prev : computedHref));
+      }
       return;
     }
 
-    const visibleIds = new Set<string>();
+    setActiveHref((prev) => (prev === computedHref ? prev : computedHref));
+  }, [clearClickLock, t.nav]);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            visibleIds.add(entry.target.id);
-          } else {
-            visibleIds.delete(entry.target.id);
-          }
-        });
+  useEffect(() => {
+    let rafId = 0;
 
-        const firstVisible = sectionIds.find((id) => visibleIds.has(id));
-        if (firstVisible) {
-          setActiveHref(`#${firstVisible}`);
-        } else if (window.scrollY < 160) {
-          setActiveHref('');
-        }
-      },
-      {
-        rootMargin: '-22% 0px -55% 0px',
-        threshold: 0.01,
+    const scheduleSync = () => {
+      if (rafId !== 0) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        syncScrollState();
+      });
+    };
+
+    const handleUserInterrupt = () => {
+      if (clickLockRef.current) {
+        clearClickLock();
+        scheduleSync();
       }
-    );
+    };
 
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [t.nav]);
+    const handleKeyInterrupt = (e: KeyboardEvent) => {
+      if (
+        clickLockRef.current &&
+        ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)
+      ) {
+        clearClickLock();
+        scheduleSync();
+      }
+    };
+
+    syncScrollState();
+    window.addEventListener('scroll', scheduleSync, { passive: true });
+    window.addEventListener('resize', scheduleSync, { passive: true });
+    window.addEventListener('hashchange', scheduleSync);
+    window.addEventListener('wheel', handleUserInterrupt, { passive: true });
+    window.addEventListener('touchstart', handleUserInterrupt, { passive: true });
+    window.addEventListener('keydown', handleKeyInterrupt);
+
+    return () => {
+      if (rafId !== 0) window.cancelAnimationFrame(rafId);
+      clearClickLock();
+      window.removeEventListener('scroll', scheduleSync);
+      window.removeEventListener('resize', scheduleSync);
+      window.removeEventListener('hashchange', scheduleSync);
+      window.removeEventListener('wheel', handleUserInterrupt);
+      window.removeEventListener('touchstart', handleUserInterrupt);
+      window.removeEventListener('keydown', handleKeyInterrupt);
+    };
+  }, [clearClickLock, syncScrollState]);
+
+  const handleNavSelect = useCallback(
+    (href: string) => {
+      clearClickLock();
+      setActiveHref(href);
+      const timerId = window.setTimeout(() => {
+        clickLockRef.current = null;
+        syncScrollState();
+      }, 1400);
+      clickLockRef.current = { href, timerId };
+    },
+    [clearClickLock, syncScrollState]
+  );
 
   const updateIndicator = useCallback(() => {
     const navEl = navRef.current;
@@ -79,23 +133,24 @@ const Header: React.FC = () => {
       return;
     }
 
-    const navRect = navEl.getBoundingClientRect();
-    const linkRect = activeEl.getBoundingClientRect();
-
-    if (navRect.width === 0 || linkRect.width === 0) {
+    const width = activeEl.offsetWidth;
+    if (navEl.clientWidth === 0 || width === 0) {
       return;
     }
 
+    // Use unscaled layout geometry relative to navEl so parent scale-[0.985] never double-scales
     const offsetStart =
       lang === 'fa'
-        ? navRect.x + navRect.width - (linkRect.x + linkRect.width)
-        : linkRect.x - navRect.x;
+        ? navEl.clientWidth - (activeEl.offsetLeft + width)
+        : activeEl.offsetLeft;
 
-    setIndicator({
-      offsetStart,
-      width: linkRect.width,
-      visible: true,
-    });
+    setIndicator((prev) =>
+      prev.visible &&
+      Math.abs(prev.offsetStart - offsetStart) < 0.1 &&
+      Math.abs(prev.width - width) < 0.1
+        ? prev
+        : { offsetStart, width, visible: true }
+    );
   }, [activeHref, lang]);
 
   useLayoutEffect(() => {
@@ -110,15 +165,23 @@ const Header: React.FC = () => {
         if (!cancelled) updateIndicator();
       });
     }
+
+    let resizeObserver: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined' && navRef.current) {
+      resizeObserver = new ResizeObserver(() => updateIndicator());
+      resizeObserver.observe(navRef.current);
+    }
+
     return () => {
       cancelled = true;
       window.removeEventListener('resize', updateIndicator);
+      resizeObserver?.disconnect();
     };
   }, [updateIndicator]);
 
   useEffect(() => {
     if (!mobileMenuOpen) return;
-    const prevOverflow = document.body.style.overflow;
+    prevBodyOverflowRef.current = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -128,7 +191,7 @@ const Header: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = prevBodyOverflowRef.current;
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [mobileMenuOpen]);
@@ -158,6 +221,7 @@ const Header: React.FC = () => {
             <a
               href="#top"
               dir="ltr"
+              onClick={() => handleNavSelect('')}
               className="font-display text-xl sm:text-2xl font-extrabold tracking-tight text-ink hover:text-accent transition-colors whitespace-nowrap shrink-0 min-h-[44px] inline-flex items-center px-2 rounded-full"
             >
               Sona.
@@ -190,7 +254,7 @@ const Header: React.FC = () => {
                     }}
                     href={item.href}
                     aria-current={isActive ? 'location' : undefined}
-                    onClick={() => setActiveHref(item.href)}
+                    onClick={() => handleNavSelect(item.href)}
                     className={`relative z-10 text-xs lg:text-sm font-medium min-h-[44px] px-2.5 lg:px-3.5 rounded-full inline-flex items-center transition-colors duration-250 whitespace-nowrap shrink-0 ${
                       isActive ? 'text-accent font-semibold' : 'text-ink-muted hover:text-ink'
                     }`}
@@ -272,7 +336,11 @@ const Header: React.FC = () => {
               <a
                 href="#top"
                 dir="ltr"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  document.body.style.overflow = prevBodyOverflowRef.current;
+                  handleNavSelect('');
+                  setMobileMenuOpen(false);
+                }}
                 className="font-display text-2xl font-extrabold tracking-tight text-ink min-h-[44px] inline-flex items-center px-1"
               >
                 Sona.
@@ -297,9 +365,11 @@ const Header: React.FC = () => {
                   <a
                     key={item.href}
                     href={item.href}
+                    aria-current={isActive ? 'location' : undefined}
                     style={{ animationDelay: `${index * 55}ms` }}
                     onClick={() => {
-                      setActiveHref(item.href);
+                      document.body.style.overflow = prevBodyOverflowRef.current;
+                      handleNavSelect(item.href);
                       setMobileMenuOpen(false);
                     }}
                     className={`animate-enter-up min-h-[52px] flex items-center justify-between py-3 text-lg font-display font-bold transition-colors ${
