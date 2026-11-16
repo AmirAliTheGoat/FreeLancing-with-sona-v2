@@ -39,12 +39,12 @@ const HeroBento: React.FC = () => {
   const heroPillars =
     lang === 'fa'
       ? [
-          { label: 'زبان انگلیسی', value: 'با GPT در ۲۰۲۶ اختیاری شده' },
+          { label: 'زبان انگلیسی', value: 'هوش مصنوعی سد زبان را کوچک‌تر کرده است' },
           { label: 'بخش فنی و VPS', value: 'چند روز تمرین برای افراد غیرفنی' },
           { label: 'شفافیت اعداد', value: 'اطلاعات جای‌گذاری پیش از انتشار' },
         ]
       : [
-          { label: 'English Requirement', value: 'AI-assisted · virtually optional in 2026' },
+          { label: 'English Requirement', value: 'AI makes English a smaller barrier' },
           { label: 'Tech Curve', value: 'Remote VPS basics learned in a few days' },
           { label: 'Data Transparency', value: 'Bracketed [PLACEHOLDER] slots pre-launch' },
         ];

@@ -4,12 +4,14 @@ interface RevealProps {
   children: React.ReactNode;
   className?: string;
   delayMs?: number;
+  index?: number;
 }
 
 export const Reveal: React.FC<RevealProps> = ({
   children,
   className = '',
   delayMs = 0,
+  index,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -18,7 +20,17 @@ export const Reveal: React.FC<RevealProps> = ({
     const el = ref.current;
     if (!el) return;
 
-    if (typeof IntersectionObserver === 'undefined') {
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const supportsScrollTimeline =
+      typeof CSS !== 'undefined' &&
+      typeof CSS.supports === 'function' &&
+      CSS.supports('animation-timeline: view()');
+
+    if (prefersReducedMotion || supportsScrollTimeline || typeof IntersectionObserver === 'undefined') {
       setVisible(true);
       return;
     }
@@ -37,15 +49,19 @@ export const Reveal: React.FC<RevealProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  const clampedDelay = Math.min(delayMs, 40);
+  const staggerMs = typeof index === 'number' && index > 0 ? index * 70 : 0;
+  const clampedDelay = Math.min(Math.max(0, delayMs + staggerMs), 700);
 
   return (
     <div
       ref={ref}
-      style={clampedDelay > 0 ? { transitionDelay: `${clampedDelay}ms` } : undefined}
-      className={`transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:translate-y-0 ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-      } ${className}`}
+      data-revealed={visible ? 'true' : 'false'}
+      style={
+        clampedDelay > 0
+          ? ({ '--reveal-delay': `${clampedDelay}ms` } as React.CSSProperties)
+          : undefined
+      }
+      className={`reveal-item ${className}`}
     >
       {children}
     </div>

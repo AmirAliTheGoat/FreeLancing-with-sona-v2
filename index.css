@@ -2,13 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Warm surface & neutral ink scale (hex fallbacks) */
+  --surface-base: #ffffff;
+  --surface-paper: #faf9f6;
+  --surface-warm: #f5f5f3;
+  --surface-sand: #eeede8;
+  --surface-stone: #e4e3dc;
+  --surface-obsidian: #0a0a0a;
+  --surface-obsidian-card: #141414;
+
+  --ink-primary: #0e0e0e;
+  --ink-muted: #59595c;
+  --brand-primary: #0e0e0e;
+  --brand-hover: #262626;
+  --brand-soft: #ecece9;
+  --border-subtle: #e4e4e0;
+
+  /* Architectural Verdigris Teal accent (hex fallbacks) */
+  --color-accent: #156358;
+  --color-accent-hover: #0f4f46;
+  --color-accent-soft: #eaf4f2;
+  --color-draft: #2563eb;
+
+  /* Fluid type scale */
+  --text-display: clamp(2.25rem, 1.55rem + 2.8vw, 3.85rem);
+  --text-h1: clamp(2rem, 1.45rem + 2.2vw, 3.25rem);
+  --text-h2: clamp(1.625rem, 1.25rem + 1.45vw, 2.75rem);
+  --text-body: clamp(0.95rem, 0.91rem + 0.18vw, 1.0625rem);
+
+  /* Layered tinted shadows (fallback) */
+  --shadow-subtle: 0 1px 2px 0 rgba(14, 14, 14, 0.04);
+  --shadow-card: 0 10px 30px -10px rgba(14, 14, 14, 0.08);
+  --shadow-elevated: 0 24px 60px -15px rgba(14, 14, 14, 0.22);
+  --shadow-soft: 0 1px 2px rgba(14, 14, 14, 0.04), 0 4px 12px -2px rgba(21, 99, 88, 0.05);
+  --shadow-lift: 0 2px 6px -1px rgba(14, 14, 14, 0.06), 0 12px 28px -6px rgba(14, 14, 14, 0.10), 0 4px 14px -4px rgba(21, 99, 88, 0.08);
+  --shadow-float: 0 6px 14px -3px rgba(14, 14, 14, 0.08), 0 24px 52px -12px rgba(14, 14, 14, 0.20), 0 8px 20px -6px rgba(21, 99, 88, 0.10);
+
+  /* Motion tokens */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+  --dur-reveal: 700ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@supports (color: oklch(0.5 0.1 180)) {
+  :root {
+    --surface-paper: oklch(0.985 0.004 85);
+    --surface-warm: oklch(0.968 0.005 90);
+    --surface-sand: oklch(0.942 0.007 88);
+    --surface-stone: oklch(0.912 0.009 88);
+    --color-accent: oklch(0.47 0.095 178);
+    --color-accent-hover: oklch(0.40 0.095 178);
+    --color-accent-soft: oklch(0.95 0.02 178);
+  }
+}
+
+@supports (color: color-mix(in oklch, black, white)) {
+  :root {
+    --shadow-soft:
+      0 1px 2px color-mix(in oklch, var(--ink-primary) 5%, transparent),
+      0 4px 12px -2px color-mix(in oklch, var(--color-accent) 7%, transparent);
+    --shadow-lift:
+      0 2px 6px -1px color-mix(in oklch, var(--ink-primary) 7%, transparent),
+      0 12px 28px -6px color-mix(in oklch, var(--ink-primary) 11%, transparent),
+      0 4px 14px -4px color-mix(in oklch, var(--color-accent) 10%, transparent);
+    --shadow-float:
+      0 6px 14px -3px color-mix(in oklch, var(--ink-primary) 9%, transparent),
+      0 24px 52px -12px color-mix(in oklch, var(--ink-primary) 22%, transparent),
+      0 8px 20px -6px color-mix(in oklch, var(--color-accent) 12%, transparent);
+  }
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(
+      0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%,
+      0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%,
+      1.006 50.1%, 1.015 55%, 1.017 61%, 1.007 74.5%, 1
+    );
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
   }
 
   body {
     @apply bg-surface text-ink font-sans antialiased overflow-x-hidden;
+    font-size: var(--text-body);
   }
 
   html[dir='ltr'] body {
@@ -33,14 +119,19 @@
   h3,
   h4 {
     @apply text-ink;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   a {
-    @apply transition-colors duration-200;
+    @apply transition-colors duration-250;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-ink ring-offset-2 ring-offset-surface;
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-surface;
   }
 
   ::selection {
@@ -87,17 +178,93 @@
   }
 }
 
+@keyframes revealRise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-enter-up {
-  animation: enterUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: enterUp var(--dur-base, 250ms) var(--ease-out-expo) both;
 }
 
 .animate-hint-swap {
-  animation: hintFade 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hintFade var(--dur-fast, 150ms) var(--ease-out-expo) both;
+}
+
+/* Reveal: IntersectionObserver fallback path */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-reveal, 700ms);
+  transition-timing-function: var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-item[data-revealed='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reveal: CSS scroll-driven path when supported */
+@supports (animation-timeline: view()) {
+  .reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation-name: revealRise;
+    animation-duration: var(--dur-reveal, 700ms);
+    animation-timing-function: var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+    animation-fill-mode: both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+}
+
+/* View Transitions prepared for language switch (opt-in later) */
+@keyframes vtFadeOut {
+  from {
+    opacity: 1;
+    filter: blur(0px);
+  }
+  to {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@keyframes vtFadeIn {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+::view-transition-old(root) {
+  animation: vtFadeOut var(--dur-fast, 150ms) var(--ease-out-expo) both;
+}
+
+::view-transition-new(root) {
+  animation: vtFadeIn var(--dur-base, 250ms) var(--ease-out-expo) both;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
   }
 
   html[dir='ltr'] .font-serif-accent {
@@ -118,8 +285,26 @@
     scroll-behavior: auto;
   }
 
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .animate-enter-up,
-  .animate-hint-swap {
+  .animate-hint-swap,
+  .reveal-item {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
     animation: none !important;
   }
 }
