@@ -1,33 +1,32 @@
 import React from 'react';
+import { AppProvider } from './context/AppContext';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import LogoMarquee from './components/LogoMarquee';
-import Categories from './components/Categories';
-import Process from './components/Process';
-import Pricing from './components/Pricing';
-import FeatureHighlight from './components/FeatureHighlight';
-import RecentProjects from './components/RecentProjects';
+import HeroBento from './components/HeroBento';
+import StraightTalkBento from './components/StraightTalkBento';
+import RealityRegister from './components/RealityRegister';
+import PackageLedger from './components/PackageLedger';
+import FieldRecords from './components/FieldRecords';
 import Faq from './components/Faq';
-import Testimonials from './components/Testimonials';
 import Footer from './components/Footer';
+import ConsultationModal from './components/ConsultationModal';
 
 function App() {
   return (
-    <div className="min-h-screen font-sans bg-surface text-ink" dir="rtl">
-      <Header />
-      <main>
-        <Hero />
-        <LogoMarquee />
-        <Categories />
-        <FeatureHighlight />
-        <Process />
-        <Pricing />
-        <RecentProjects />
-        <Faq />
-        <Testimonials />
-      </main>
-      <Footer />
-    </div>
+    <AppProvider>
+      <div className="min-h-screen font-sans bg-surface text-ink">
+        <Header />
+        <main>
+          <HeroBento />
+          <StraightTalkBento />
+          <RealityRegister />
+          <PackageLedger />
+          <FieldRecords />
+          <Faq />
+        </main>
+        <Footer />
+        <ConsultationModal />
+      </div>
+    </AppProvider>
   );
 }
 
